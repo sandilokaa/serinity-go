@@ -1,11 +1,14 @@
 package cloth
 
+import "errors"
+
 type Service interface {
 	SaveCloth(input CreateClothInput) (Cloth, error)
 	FindAllCloth(search string) ([]Cloth, error)
 	FindClothByID(input ClothInputDetail) (Cloth, error)
 	UpdateClothByID(inputID ClothInputDetail, inputData UpdateClothInput) (Cloth, error)
 	DeleteClothByID(inputID ClothInputDetail) (Cloth, error)
+	CreateClothImage(input CreateClothImageInput, fileLocation string) (ClothImage, error)
 }
 
 type service struct {
@@ -114,4 +117,37 @@ func (s *service) DeleteClothByID(inputID ClothInputDetail) (Cloth, error) {
 	}
 
 	return deletedCloth, nil
+}
+
+func (s *service) CreateClothImage(input CreateClothImageInput, fileLocation string) (ClothImage, error) {
+	cloth, err := s.repository.FindClothByID(input.ClothID)
+	if err != nil {
+		return ClothImage{}, err
+	}
+
+	if cloth.UserID != input.User.ID {
+		return ClothImage{}, errors.New("not an owner of the cloth")
+	}
+
+	isPrimary := 0
+	if input.IsPrimary {
+		isPrimary = 1
+
+		_, err := s.repository.MarkAllImagesAsNonPrimary(input.ClothID)
+		if err != nil {
+			return ClothImage{}, err
+		}
+	}
+
+	clothImage := ClothImage{}
+	clothImage.ClothID = input.ClothID
+	clothImage.IsPrimary = isPrimary
+	clothImage.FileName = fileLocation
+
+	newClothImage, err := s.repository.CreateClothImage(clothImage)
+	if err != nil {
+		return newClothImage, err
+	}
+
+	return newClothImage, nil
 }

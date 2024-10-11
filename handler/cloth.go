@@ -4,6 +4,7 @@ import (
 	"cheggstore/cloth"
 	"cheggstore/helper"
 	"cheggstore/user"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -147,4 +148,56 @@ func (h *clothHandler) DeleteClothByID(c *gin.Context) {
 	response := helper.APIResponse("Success to deleted cloth", http.StatusOK, "success", deletedCloth)
 	c.JSON(http.StatusOK, response)
 
+}
+
+func (h *clothHandler) UploadImage(c *gin.Context) {
+	var input cloth.CreateClothImageInput
+
+	err := c.ShouldBind(&input)
+
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to upload cloth image", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+	userID := currentUser.ID
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload cloth image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload cloth image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.service.CreateClothImage(input, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload cloth image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	response := helper.APIResponse("Success to upload cloth image", http.StatusOK, "success", data)
+
+	c.JSON(http.StatusOK, response)
 }

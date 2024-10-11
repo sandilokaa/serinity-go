@@ -11,6 +11,8 @@ type Repository interface {
 	FindClothByID(ID int) (Cloth, error)
 	UpdateClothByID(cloth Cloth) (Cloth, error)
 	DeleteClothById(ID int) (Cloth, error)
+	CreateClothImage(clothImage ClothImage) (ClothImage, error)
+	MarkAllImagesAsNonPrimary(clothID int) (bool, error)
 }
 
 type repository struct {
@@ -35,10 +37,10 @@ func (r *repository) FindAllCloth(search string) ([]Cloth, error) {
 
 	query := r.db
 	if search != "" {
-		query = query.Where("name LIKE ?", "%"+search+"%")
+		query = query.Preload("ClothImages", "cloth_images.is_primary = 1").Where("name LIKE ?", "%"+search+"%")
 	}
 
-	err := query.Find(&cloths).Error
+	err := query.Preload("ClothImages", "cloth_images.is_primary = 1").Find(&cloths).Error
 	if err != nil {
 		return cloths, err
 	}
@@ -74,4 +76,22 @@ func (r *repository) DeleteClothById(ID int) (Cloth, error) {
 	}
 
 	return cloth, nil
+}
+
+func (r *repository) CreateClothImage(clothImage ClothImage) (ClothImage, error) {
+	err := r.db.Create(&clothImage).Error
+	if err != nil {
+		return clothImage, err
+	}
+
+	return clothImage, nil
+}
+
+func (r *repository) MarkAllImagesAsNonPrimary(clothID int) (bool, error) {
+	err := r.db.Model(&ClothImage{}).Where("cloth_id = ?", clothID).Update("is_primary", false).Error
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

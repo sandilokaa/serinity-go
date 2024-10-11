@@ -11,6 +11,7 @@ type ClothFormatter struct {
 	Size        string `json:"size"`
 	Stock       int    `json:"stock"`
 	Color       string `json:"color"`
+	ImageURL    string `json:"image_url"`
 }
 
 func FormatCloth(cloth Cloth) ClothFormatter {
@@ -25,6 +26,11 @@ func FormatCloth(cloth Cloth) ClothFormatter {
 	clothFormatter.Size = cloth.Size
 	clothFormatter.Stock = cloth.Stock
 	clothFormatter.Color = cloth.Color
+	clothFormatter.ImageURL = ""
+
+	if len(cloth.ClothImages) > 0 {
+		clothFormatter.ImageURL = cloth.ClothImages[0].FileName
+	}
 
 	return clothFormatter
 }
