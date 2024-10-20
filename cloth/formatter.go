@@ -60,6 +60,7 @@ type ClothDetailFormatter struct {
 	User        ClothUserFormatter     `json:"user"`
 	Material    ClothMaterialFormatter `json:"material"`
 	Supplier    ClothSupplierFormatter `json:"supplier"`
+	Images      []ClothImageFormatter  `json:"images"`
 }
 
 type ClothUserFormatter struct {
@@ -72,6 +73,11 @@ type ClothMaterialFormatter struct {
 
 type ClothSupplierFormatter struct {
 	Name string `json:"name"`
+}
+
+type ClothImageFormatter struct {
+	ImageUrl  string `json:"image_url"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
@@ -102,6 +108,25 @@ func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 	clothDetailFormatter.User = clothUserFormatter
 	clothDetailFormatter.Material = clothMaterialFormatter
 	clothDetailFormatter.Supplier = clothSupplierFormatter
+
+	images := []ClothImageFormatter{}
+
+	for _, image := range cloth.ClothImages {
+		clothImageFormatter := ClothImageFormatter{}
+		clothImageFormatter.ImageUrl = image.FileName
+
+		isPrimary := false
+
+		if image.IsPrimary == 1 {
+			isPrimary = true
+		}
+
+		clothImageFormatter.IsPrimary = isPrimary
+
+		images = append(images, clothImageFormatter)
+	}
+
+	clothDetailFormatter.Images = images
 
 	return clothDetailFormatter
 }
@@ -135,6 +160,24 @@ func UpdatedFormatCloth(updatedCloth Cloth, oldCloth Cloth) map[string]interface
 	}
 	if oldCloth.Stock != updatedCloth.Stock {
 		updatedFields["stock"] = updatedCloth.Stock
+	}
+
+	return updatedFields
+}
+
+func UpdateFormatClothImage(updatedClothImage ClothImage, oldClothImage ClothImage) map[string]interface{} {
+	updatedFields := make(map[string]interface{})
+
+	if oldClothImage.ClothID != updatedClothImage.ClothID {
+		updatedFields["cloth_id"] = updatedClothImage.ClothID
+	}
+
+	if oldClothImage.IsPrimary != updatedClothImage.IsPrimary {
+		updatedFields["is_primary"] = updatedClothImage.IsPrimary
+	}
+
+	if oldClothImage.FileName != updatedClothImage.FileName {
+		updatedFields["file"] = updatedClothImage.FileName
 	}
 
 	return updatedFields

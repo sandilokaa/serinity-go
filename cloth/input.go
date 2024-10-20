@@ -37,3 +37,13 @@ type CreateClothImageInput struct {
 	IsPrimary bool `form:"is_primary"`
 	User      user.User
 }
+
+type ClothImageInputDetail struct {
+	ID int `uri:"id" binding:"required"`
+}
+
+type UpdateClothImageInput struct {
+	ClothID   int   `form:"cloth_id" binding:"required"`
+	IsPrimary *bool `form:"is_primary"`
+	User      user.User
+}

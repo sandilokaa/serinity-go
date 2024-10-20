@@ -90,7 +90,7 @@ func (h *clothHandler) UpdateClothByID(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.APIResponse("Failed to get supplier", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.APIResponse("Failed to get cloth", http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -101,7 +101,7 @@ func (h *clothHandler) UpdateClothByID(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.APIResponse("Failed to create cloth", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.APIResponse("Failed to update cloth", http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
@@ -200,4 +200,69 @@ func (h *clothHandler) UploadImage(c *gin.Context) {
 	response := helper.APIResponse("Success to upload cloth image", http.StatusOK, "success", data)
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *clothHandler) UpdateClothImage(c *gin.Context) {
+	var inputID cloth.ClothImageInputDetail
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to get cloth image", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	var inputData cloth.UpdateClothImageInput
+	err = c.ShouldBindJSON(&inputData)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to update cloth image", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload cloth image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.APIResponse("Failed to upload cloth image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	oldClothImage, err := h.service.FindClothImageByID(inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed to find cloth image", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	updatedClothImage, err := h.service.UpdateClothImage(inputID, inputData, path)
+	if err != nil {
+		response := helper.APIResponse("Failed to updated cloth image", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Success to updated cloth image", http.StatusOK, "success", cloth.UpdateFormatClothImage(updatedClothImage, oldClothImage))
+	c.JSON(http.StatusOK, response)
+
 }

@@ -1,6 +1,10 @@
 package cloth
 
-import "errors"
+import (
+	"errors"
+	"log"
+	"os"
+)
 
 type Service interface {
 	SaveCloth(input CreateClothInput) (Cloth, error)
@@ -9,6 +13,8 @@ type Service interface {
 	UpdateClothByID(inputID ClothInputDetail, inputData UpdateClothInput) (Cloth, error)
 	DeleteClothByID(inputID ClothInputDetail) (Cloth, error)
 	CreateClothImage(input CreateClothImageInput, fileLocation string) (ClothImage, error)
+	FindClothImageByID(input ClothImageInputDetail) (ClothImage, error)
+	UpdateClothImage(inputID ClothImageInputDetail, inputData UpdateClothImageInput, fileLocation string) (ClothImage, error)
 }
 
 type service struct {
@@ -150,4 +156,50 @@ func (s *service) CreateClothImage(input CreateClothImageInput, fileLocation str
 	}
 
 	return newClothImage, nil
+}
+
+func (s *service) FindClothImageByID(input ClothImageInputDetail) (ClothImage, error) {
+	clothImage, err := s.repository.FindClothImageByID(input.ID)
+	if err != nil {
+		return clothImage, err
+	}
+
+	return clothImage, nil
+}
+
+func (s *service) UpdateClothImage(inputID ClothImageInputDetail, inputData UpdateClothImageInput, fileLocation string) (ClothImage, error) {
+	clothImage, err := s.repository.FindClothImageByID(inputID.ID)
+	if err != nil {
+		return clothImage, err
+	}
+
+	if inputData.ClothID != 0 {
+		clothImage.ClothID = inputData.ClothID
+	}
+
+	if inputData.IsPrimary != nil {
+		if *inputData.IsPrimary {
+			clothImage.IsPrimary = 1
+		} else {
+			clothImage.IsPrimary = 0
+		}
+	}
+
+	oldFileName := clothImage.FileName
+	if fileLocation != "" {
+		if oldFileName != "" {
+			err := os.Remove(oldFileName)
+			if err != nil {
+				log.Println("Failed to delete old image")
+			}
+		}
+		clothImage.FileName = fileLocation
+	}
+
+	updatedImageCloth, err := s.repository.UpdateClothImage(clothImage)
+	if err != nil {
+		return updatedImageCloth, err
+	}
+
+	return updatedImageCloth, nil
 }

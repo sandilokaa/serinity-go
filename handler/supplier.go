@@ -56,7 +56,7 @@ func (h *supplierHandler) FindAllSupplier(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Success to create supplier", http.StatusOK, "success", supplier.FormatSuppliers(suppliers))
+	response := helper.APIResponse("Success to find supplier", http.StatusOK, "success", supplier.FormatSuppliers(suppliers))
 	c.JSON(http.StatusOK, response)
 }
 
@@ -77,7 +77,7 @@ func (h *supplierHandler) FindSupplierByID(c *gin.Context) {
 		return
 	}
 
-	response := helper.APIResponse("Success to create supplier", http.StatusOK, "success", supplier.FormatSupplierDetail(supplier))
+	response := helper.APIResponse("Success to find supplier", http.StatusOK, "success", supplier.FormatSupplierDetail(supplier))
 	c.JSON(http.StatusOK, response)
 }
 

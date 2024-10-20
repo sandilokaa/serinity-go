@@ -66,6 +66,8 @@ func main() {
 		protectedRoutes.POST("/cloths", clothHandler.SaveCloth)
 		protectedRoutes.PUT("/cloths/:id", clothHandler.UpdateClothByID)
 		protectedRoutes.DELETE("/cloths/:id", clothHandler.DeleteClothByID)
+		protectedRoutes.POST("/cloths/upload-images", clothHandler.UploadImage)
+		protectedRoutes.PUT("/cloths/upload-images/:id", clothHandler.UpdateClothImage)
 	}
 
 	router.Run()
