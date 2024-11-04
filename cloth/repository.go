@@ -13,8 +13,6 @@ type Repository interface {
 	DeleteClothById(ID int) (Cloth, error)
 	CreateClothImage(clothImage ClothImage) (ClothImage, error)
 	MarkAllImagesAsNonPrimary(clothID int) (bool, error)
-	FindClothImageByID(ID int) (ClothImage, error)
-	UpdateClothImage(clothImage ClothImage) (ClothImage, error)
 }
 
 type repository struct {
@@ -96,24 +94,4 @@ func (r *repository) MarkAllImagesAsNonPrimary(clothID int) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func (r *repository) FindClothImageByID(ID int) (ClothImage, error) {
-	var clothImage ClothImage
-
-	err := r.db.Where("id = ?", ID).Find(&clothImage).Error
-	if err != nil {
-		return clothImage, err
-	}
-
-	return clothImage, nil
-}
-
-func (r *repository) UpdateClothImage(clothImage ClothImage) (ClothImage, error) {
-	err := r.db.Save(&clothImage).Error
-	if err != nil {
-		return clothImage, err
-	}
-
-	return clothImage, nil
 }
