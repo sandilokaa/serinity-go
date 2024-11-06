@@ -54,6 +54,33 @@ func AuthMiddleware(authService auth.Service, userService user.Service) gin.Hand
 		}
 
 		c.Set("currentUser", user)
+		c.Set("userRole", user.Role)
+		c.Next()
 	}
 
+}
+
+func RoleMiddleware(allowedRoles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("userRole")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "role not found"})
+			return
+		}
+
+		roleString, ok := userRole.(string)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "invalid role"})
+			return
+		}
+
+		for _, role := range allowedRoles {
+			if role == roleString {
+				c.Next()
+				return
+			}
+		}
+
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "access denied"})
+	}
 }

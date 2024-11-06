@@ -7,6 +7,7 @@ import (
 	"cheggstore/material"
 	"cheggstore/middleware"
 	"cheggstore/supplier"
+	"cheggstore/transaction"
 	"cheggstore/user"
 	"log"
 
@@ -28,17 +29,20 @@ func main() {
 	materialRepository := material.NewRepository(db)
 	supplierRepository := supplier.NewRepository(db)
 	clothRepository := cloth.NewRepository(db)
+	transactionRepository := transaction.NewRepository(db)
 
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 	materialService := material.NewService(materialRepository)
 	supplierService := supplier.NewService(supplierRepository)
 	clothService := cloth.NewService(clothRepository)
+	transactionService := transaction.NewService(transactionRepository, clothRepository)
 
 	userHandler := handler.NewHandler(userService, authService)
 	materialHandler := handler.NewMaterialHandler(materialService)
 	supplierHandler := handler.NewSupplierHandler(supplierService)
 	clothHandler := handler.NewClothHandler(clothService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -47,27 +51,28 @@ func main() {
 
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.LoginUser)
-	api.GET("/materials", materialHandler.GetAllMaterial)
-	api.GET("/materials/:id", materialHandler.GetMaterialById)
-	api.GET("/suppliers", supplierHandler.FindAllSupplier)
-	api.GET("/suppliers/:id", supplierHandler.FindSupplierByID)
 	api.GET("/cloths", clothHandler.FindAllCloth)
 	api.GET("/cloths/:id", clothHandler.FindClothByID)
 
 	protectedRoutes := api.Group("/protected", middleware.AuthMiddleware(authService, userService))
 	{
 		protectedRoutes.GET("/auth/me", userHandler.CurrentUser)
-		protectedRoutes.POST("/materials", materialHandler.CreateMaterial)
-		protectedRoutes.PUT("/materials/:id", materialHandler.UpdateMaterial)
-		protectedRoutes.DELETE("/materials/:id", materialHandler.DeleteMaterial)
-		protectedRoutes.POST("/suppliers", supplierHandler.CreateSupplier)
-		protectedRoutes.PUT("/suppliers/:id", supplierHandler.UpdateSupplierByID)
-		protectedRoutes.DELETE("/suppliers/:id", supplierHandler.DeleteSupplierByID)
-		protectedRoutes.POST("/cloths", clothHandler.SaveCloth)
-		protectedRoutes.PUT("/cloths/:id", clothHandler.UpdateClothByID)
-		protectedRoutes.DELETE("/cloths/:id", clothHandler.DeleteClothByID)
-		protectedRoutes.POST("/cloths/upload-images", clothHandler.UploadImage)
-		protectedRoutes.PUT("/cloths/upload-images/:id", clothHandler.UpdateClothImage)
+		protectedRoutes.GET("/materials", middleware.RoleMiddleware("admin"), materialHandler.GetAllMaterial)
+		protectedRoutes.GET("/materials/:id", middleware.RoleMiddleware("admin"), materialHandler.GetMaterialById)
+		protectedRoutes.POST("/materials", middleware.RoleMiddleware("admin"), materialHandler.CreateMaterial)
+		protectedRoutes.PUT("/materials/:id", middleware.RoleMiddleware("admin"), materialHandler.UpdateMaterial)
+		protectedRoutes.DELETE("/materials/:id", middleware.RoleMiddleware("admin"), materialHandler.DeleteMaterial)
+		protectedRoutes.GET("/suppliers", middleware.RoleMiddleware("admin"), supplierHandler.FindAllSupplier)
+		protectedRoutes.GET("/suppliers/:id", middleware.RoleMiddleware("admin"), supplierHandler.FindSupplierByID)
+		protectedRoutes.POST("/suppliers", middleware.RoleMiddleware("admin"), supplierHandler.CreateSupplier)
+		protectedRoutes.PUT("/suppliers/:id", middleware.RoleMiddleware("admin"), supplierHandler.UpdateSupplierByID)
+		protectedRoutes.DELETE("/suppliers/:id", middleware.RoleMiddleware("admin"), supplierHandler.DeleteSupplierByID)
+		protectedRoutes.POST("/cloths", middleware.RoleMiddleware("admin"), clothHandler.SaveCloth)
+		protectedRoutes.PUT("/cloths/:id", middleware.RoleMiddleware("admin"), clothHandler.UpdateClothByID)
+		protectedRoutes.DELETE("/cloths/:id", middleware.RoleMiddleware("admin"), clothHandler.DeleteClothByID)
+		protectedRoutes.POST("/cloths/upload-images", middleware.RoleMiddleware("admin"), clothHandler.UploadImage)
+		protectedRoutes.POST("/cloths/transactions", transactionHandler.CreateTransaction)
+		protectedRoutes.GET("/cloths/transactions", transactionHandler.GetUserTransaction)
 	}
 
 	router.Run()
