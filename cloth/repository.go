@@ -10,6 +10,7 @@ type Repository interface {
 	FindAllCloth(search string) ([]Cloth, error)
 	FindClothByID(ID int) (Cloth, error)
 	UpdateClothByID(cloth Cloth) (Cloth, error)
+	UpdateStockByClothID(clothID int, newStock int) error
 	DeleteClothById(ID int) (Cloth, error)
 	CreateClothImage(clothImage ClothImage) (ClothImage, error)
 	MarkAllImagesAsNonPrimary(clothID int) (bool, error)
@@ -66,6 +67,16 @@ func (r *repository) UpdateClothByID(cloth Cloth) (Cloth, error) {
 	}
 
 	return cloth, nil
+}
+
+func (r *repository) UpdateStockByClothID(clothID int, newStock int) error {
+	var cloth Cloth
+	if err := r.db.First(&cloth, clothID).Error; err != nil {
+		return err
+	}
+
+	cloth.Stock = newStock
+	return r.db.Save(&cloth).Error
 }
 
 func (r *repository) DeleteClothById(ID int) (Cloth, error) {
