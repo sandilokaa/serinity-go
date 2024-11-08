@@ -6,6 +6,7 @@ import (
 	"cheggstore/handler"
 	"cheggstore/material"
 	"cheggstore/middleware"
+	"cheggstore/payment"
 	"cheggstore/supplier"
 	"cheggstore/transaction"
 	"cheggstore/user"
@@ -36,7 +37,8 @@ func main() {
 	materialService := material.NewService(materialRepository)
 	supplierService := supplier.NewService(supplierRepository)
 	clothService := cloth.NewService(clothRepository)
-	transactionService := transaction.NewService(transactionRepository, clothRepository)
+	paymentService := payment.NewService()
+	transactionService := transaction.NewService(transactionRepository, clothRepository, paymentService)
 
 	userHandler := handler.NewHandler(userService, authService)
 	materialHandler := handler.NewMaterialHandler(materialService)
