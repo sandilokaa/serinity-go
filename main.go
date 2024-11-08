@@ -72,7 +72,10 @@ func main() {
 		protectedRoutes.DELETE("/cloths/:id", middleware.RoleMiddleware("admin"), clothHandler.DeleteClothByID)
 		protectedRoutes.POST("/cloths/upload-images", middleware.RoleMiddleware("admin"), clothHandler.UploadImage)
 		protectedRoutes.POST("/cloths/transactions", transactionHandler.CreateTransaction)
-		protectedRoutes.GET("/cloths/transactions", transactionHandler.GetUserTransaction)
+		protectedRoutes.GET("/cloths/:userId/transactions", transactionHandler.GetTransactionByUserID)
+		protectedRoutes.GET("/cloths/:userId/transactions/:id", transactionHandler.GetTransactionUserIDByID)
+		protectedRoutes.GET("/cloths/transactions", middleware.RoleMiddleware("admin"), transactionHandler.FindAllTransaction)
+		protectedRoutes.GET("/cloths/transactions/:id", middleware.RoleMiddleware("admin"), transactionHandler.GetTransactionByID)
 	}
 
 	router.Run()
