@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"cheggstore/cloth"
+	"cheggstore/helper"
 	"cheggstore/payment"
 	"fmt"
 	"strconv"
@@ -88,7 +89,7 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 	transaction.Quantity = input.Quantity
 	transaction.Amount = price * input.Quantity
 	transaction.Status = "pending"
-	transaction.Code = "12345"
+	transaction.Code = helper.GenerateTransactionCode()
 
 	newTransaction, err := s.repository.Save(transaction)
 	if err != nil {
