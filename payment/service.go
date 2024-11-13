@@ -14,14 +14,14 @@ type service struct {
 }
 
 type Service interface {
-	GetPaymentURL(transaction Transaction, user user.User) (string, error)
+	GetPaymentURL(transaction Transaction, user user.User, items []midtrans.ItemDetail) (string, error)
 }
 
 func NewService() *service {
 	return &service{}
 }
 
-func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
+func (s *service) GetPaymentURL(transaction Transaction, user user.User, items []midtrans.ItemDetail) (string, error) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -42,9 +42,10 @@ func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string
 			GrossAmt: int64(transaction.Amount),
 		},
 		CustomerDetail: &midtrans.CustDetail{
-			Email: user.Email,
 			FName: user.Name,
+			Email: user.Email,
 		},
+		Items: &items,
 	}
 
 	snapTokenResp, err := snapGateway.GetToken(snapReq)
