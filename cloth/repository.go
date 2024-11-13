@@ -13,7 +13,7 @@ type Repository interface {
 	FindClothVariationByID(ID int) (ClothVariation, error)
 	UpdateClothByID(cloth Cloth) (Cloth, error)
 	UpdateClothVariationByID(clothVariation ClothVariation) (ClothVariation, error)
-	// UpdateStockByClothID(clothID int, newStock int) error
+	UpdateStockByClothID(ID int, newStock int) error
 	DeleteClothById(ID int) (Cloth, error)
 	DeleteClothVariationByClothId(clothID int) (ClothVariation, error)
 	CreateClothImage(clothImage ClothImage) (ClothImage, error)
@@ -102,15 +102,15 @@ func (r *repository) UpdateClothVariationByID(clothVariation ClothVariation) (Cl
 	return clothVariation, nil
 }
 
-// func (r *repository) UpdateStockByClothID(clothID int, newStock int) error {
-// 	var cloth ClothVariation
-// 	if err := r.db.First(&cloth, clothID).Error; err != nil {
-// 		return err
-// 	}
+func (r *repository) UpdateStockByClothID(ID int, newStock int) error {
+	var clothVariation ClothVariation
+	if err := r.db.First(&clothVariation, ID).Error; err != nil {
+		return err
+	}
 
-// 	cloth.Stock = newStock
-// 	return r.db.Save(&cloth).Error
-// }
+	clothVariation.Stock = newStock
+	return r.db.Save(&clothVariation).Error
+}
 
 func (r *repository) DeleteClothById(ID int) (Cloth, error) {
 	var cloth Cloth
