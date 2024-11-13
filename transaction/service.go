@@ -6,6 +6,8 @@ import (
 	"cheggstore/payment"
 	"fmt"
 	"strconv"
+
+	"github.com/veritrans/go-midtrans"
 )
 
 type service struct {
@@ -83,8 +85,14 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 		return Transaction{}, err
 	}
 
+	clothVariation, err := s.clothRepository.FindClothVariationByID(input.ClothVariationID)
+	if err != nil {
+		return Transaction{}, err
+	}
+
 	transaction := Transaction{}
 	transaction.ClothID = input.ClothID
+	transaction.ClothVariationID = input.ClothVariationID
 	transaction.UserID = input.User.ID
 	transaction.Quantity = input.Quantity
 	transaction.Amount = price * input.Quantity
@@ -99,9 +107,19 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 	paymentTransaction := payment.Transaction{
 		ID:     newTransaction.ID,
 		Amount: newTransaction.Amount,
+		Cloth:  payment.ClothDetail{Name: cloth.Name},
 	}
 
-	paymentURL, err := s.paymentService.GetPaymentURL(paymentTransaction, input.User)
+	itemDetail := []midtrans.ItemDetail{
+		{
+			ID:    strconv.Itoa(cloth.ID),
+			Name:  fmt.Sprintf("%s - %s - %s", cloth.Name, clothVariation.Color, clothVariation.Size),
+			Price: int64(price),
+			Qty:   int32(input.Quantity),
+		},
+	}
+
+	paymentURL, err := s.paymentService.GetPaymentURL(paymentTransaction, input.User, itemDetail)
 	if err != nil {
 		return newTransaction, err
 	}
@@ -113,7 +131,7 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 		return newTransaction, err
 	}
 
-	err = s.clothRepository.UpdateStockByClothID(cloth.ID, cloth.Stock-transaction.Quantity)
+	err = s.clothRepository.UpdateStockByClothID(clothVariation.ID, clothVariation.Stock-transaction.Quantity)
 	if err != nil {
 		return newTransaction, err
 	}

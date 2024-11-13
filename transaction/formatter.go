@@ -37,10 +37,16 @@ type UserTransactionFormatter struct {
 }
 
 type ClothFormatter struct {
-	Name     string `json:"name"`
-	Color    string `json:"color"`
-	Size     string `json:"size"`
-	ImageURL string `json:"image_url"`
+	Name      string                    `json:"name"`
+	Color     string                    `json:"color"`
+	Size      string                    `json:"size"`
+	ImageURL  string                    `json:"image_url"`
+	Variation []ClothVariationFormatter `json:"variation"`
+}
+
+type ClothVariationFormatter struct {
+	Size  string `json:"size"`
+	Color string `json:"color"`
 }
 
 func FormatUserTransaction(transaction Transaction) UserTransactionFormatter {
@@ -53,12 +59,19 @@ func FormatUserTransaction(transaction Transaction) UserTransactionFormatter {
 
 	clothFormatter := ClothFormatter{}
 	clothFormatter.Name = transaction.Cloth.Name
-	clothFormatter.Color = transaction.Cloth.Color
-	clothFormatter.Size = transaction.Cloth.Size
 	clothFormatter.ImageURL = ""
 
 	if len(transaction.Cloth.ClothImages) > 0 {
 		clothFormatter.ImageURL = transaction.Cloth.ClothImages[0].FileName
+	}
+
+	for _, variation := range transaction.Cloth.Variation {
+		clothVariationFormatter := ClothVariationFormatter{
+			Color: variation.Color,
+			Size:  variation.Size,
+		}
+
+		formatter.Cloth.Variation = append(formatter.Cloth.Variation, clothVariationFormatter)
 	}
 
 	formatter.Cloth = clothFormatter
@@ -93,10 +106,11 @@ type TransactionDetailFormatter struct {
 }
 
 type ClothDetailFormatter struct {
-	Name     string `json:"name"`
-	Color    string `json:"color"`
-	Size     string `json:"size"`
-	ImageURL string `json:"image_url"`
+	Name      string                          `json:"name"`
+	Color     string                          `json:"color"`
+	Size      string                          `json:"size"`
+	ImageURL  string                          `json:"image_url"`
+	Variation []ClothVariationDetailFormatter `json:"variation"`
 }
 
 type ClothDetailMaterialFormatter struct {
@@ -105,6 +119,11 @@ type ClothDetailMaterialFormatter struct {
 
 type ClothUserProfileFormatter struct {
 	Name string `json:"name"`
+}
+
+type ClothVariationDetailFormatter struct {
+	Size  string `json:"size"`
+	Color string `json:"color"`
 }
 
 func FormatTransactionDetail(transaction Transaction) TransactionDetailFormatter {
@@ -117,8 +136,6 @@ func FormatTransactionDetail(transaction Transaction) TransactionDetailFormatter
 
 	clothFormatter := ClothDetailFormatter{}
 	clothFormatter.Name = transaction.Cloth.Name
-	clothFormatter.Color = transaction.Cloth.Color
-	clothFormatter.Size = transaction.Cloth.Size
 	clothFormatter.ImageURL = ""
 
 	materialFormatter := ClothDetailMaterialFormatter{}
@@ -129,6 +146,15 @@ func FormatTransactionDetail(transaction Transaction) TransactionDetailFormatter
 
 	if len(transaction.Cloth.ClothImages) > 0 {
 		clothFormatter.ImageURL = transaction.Cloth.ClothImages[0].FileName
+	}
+
+	for _, variation := range transaction.Cloth.Variation {
+		clothVariationDetailFormatter := ClothVariationDetailFormatter{
+			Color: variation.Color,
+			Size:  variation.Size,
+		}
+
+		formatter.Cloth.Variation = append(formatter.Cloth.Variation, clothVariationDetailFormatter)
 	}
 
 	formatter.Cloth = clothFormatter
