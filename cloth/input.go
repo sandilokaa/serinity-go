@@ -6,14 +6,18 @@ import (
 
 type CreateClothInput struct {
 	User        user.User
-	MaterialID  int    `json:"material_id" binding:"required"`
-	SupplierID  int    `json:"supplier_id" binding:"required"`
-	Name        string `json:"name" binding:"required"`
-	Color       string `json:"color" binding:"required"`
-	Price       string `json:"price" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	Size        string `json:"size" binding:"required"`
-	Stock       int    `json:"stock" binding:"required"`
+	MaterialID  int                   `json:"material_id" binding:"required"`
+	SupplierID  int                   `json:"supplier_id" binding:"required"`
+	Name        string                `json:"name" binding:"required"`
+	Price       string                `json:"price" binding:"required"`
+	Description string                `json:"description" binding:"required"`
+	Variations  []ClothVariationInput `json:"variations"`
+}
+
+type ClothVariationInput struct {
+	Size  string `json:"size" binding:"required"`
+	Stock int    `json:"stock" binding:"required"`
+	Color string `json:"color" binding:"required"`
 }
 
 type ClothInputDetail struct {
@@ -30,6 +34,12 @@ type UpdateClothInput struct {
 	Description string `json:"description"`
 	Size        string `json:"size"`
 	Stock       int    `json:"stock"`
+}
+
+type UpdateClothVariationInput struct {
+	Size  string `json:"size"`
+	Color string `json:"color"`
+	Stock int    `json:"stock"`
 }
 
 type CreateClothImageInput struct {

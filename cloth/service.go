@@ -1,14 +1,14 @@
 package cloth
 
-import (
-	"errors"
-)
+import "errors"
 
 type Service interface {
 	SaveCloth(input CreateClothInput) (Cloth, error)
 	FindAllCloth(search string) ([]Cloth, error)
 	FindClothByID(input ClothInputDetail) (Cloth, error)
+	FindClothVariationByID(input ClothInputDetail) (ClothVariation, error)
 	UpdateClothByID(inputID ClothInputDetail, inputData UpdateClothInput) (Cloth, error)
+	UpdateClothVariationByID(inputID ClothInputDetail, inputData UpdateClothVariationInput) (ClothVariation, error)
 	DeleteClothByID(inputID ClothInputDetail) (Cloth, error)
 	CreateClothImage(input CreateClothImageInput, fileLocation string) (ClothImage, error)
 }
@@ -26,9 +26,6 @@ func (s *service) SaveCloth(input CreateClothInput) (Cloth, error) {
 	cloth.Name = input.Name
 	cloth.Price = input.Price
 	cloth.Description = input.Description
-	cloth.Size = input.Size
-	cloth.Stock = input.Stock
-	cloth.Color = input.Color
 	cloth.UserID = input.User.ID
 	cloth.MaterialID = input.MaterialID
 	cloth.SupplierID = input.SupplierID
@@ -36,6 +33,20 @@ func (s *service) SaveCloth(input CreateClothInput) (Cloth, error) {
 	newCloth, err := s.repository.SaveCloth(cloth)
 	if err != nil {
 		return newCloth, err
+	}
+
+	for _, variation := range input.Variations {
+		clothVariation := ClothVariation{
+			ClothID: newCloth.ID,
+			Size:    variation.Size,
+			Color:   variation.Color,
+			Stock:   variation.Stock,
+		}
+
+		_, err := s.repository.SaveClothVariation(clothVariation)
+		if err != nil {
+			return newCloth, err
+		}
 	}
 
 	return newCloth, nil
@@ -59,6 +70,15 @@ func (s *service) FindClothByID(input ClothInputDetail) (Cloth, error) {
 	return cloth, nil
 }
 
+func (s *service) FindClothVariationByID(input ClothInputDetail) (ClothVariation, error) {
+	clothVariation, err := s.repository.FindClothVariationByID(input.ID)
+	if err != nil {
+		return clothVariation, err
+	}
+
+	return clothVariation, nil
+}
+
 func (s *service) UpdateClothByID(inputID ClothInputDetail, inputData UpdateClothInput) (Cloth, error) {
 
 	cloth, err := s.repository.FindClothByID(inputID.ID)
@@ -72,18 +92,6 @@ func (s *service) UpdateClothByID(inputID ClothInputDetail, inputData UpdateClot
 
 	if inputData.Price != "" {
 		cloth.Price = inputData.Price
-	}
-
-	if inputData.Size != "" {
-		cloth.Size = inputData.Size
-	}
-
-	if inputData.Stock != 0 {
-		cloth.Stock = inputData.Stock
-	}
-
-	if inputData.Color != "" {
-		cloth.Color = inputData.Color
 	}
 
 	if inputData.Description != "" {
@@ -107,8 +115,39 @@ func (s *service) UpdateClothByID(inputID ClothInputDetail, inputData UpdateClot
 
 }
 
+func (s *service) UpdateClothVariationByID(inputID ClothInputDetail, inputData UpdateClothVariationInput) (ClothVariation, error) {
+	clothVariation, err := s.repository.FindClothVariationByID(inputID.ID)
+	if err != nil {
+		return clothVariation, err
+	}
+
+	if inputData.Size != "" {
+		clothVariation.Size = inputData.Size
+	}
+
+	if inputData.Stock != 0 {
+		clothVariation.Stock = inputData.Stock
+	}
+
+	if inputData.Color != "" {
+		clothVariation.Color = inputData.Color
+	}
+
+	updatedClothVariation, err := s.repository.UpdateClothVariationByID(clothVariation)
+	if err != nil {
+		return updatedClothVariation, err
+	}
+
+	return updatedClothVariation, nil
+}
+
 func (s *service) DeleteClothByID(inputID ClothInputDetail) (Cloth, error) {
 	cloth, err := s.repository.FindClothByID(inputID.ID)
+	if err != nil {
+		return cloth, err
+	}
+
+	_, err = s.repository.DeleteClothVariationByClothId(cloth.ID)
 	if err != nil {
 		return cloth, err
 	}

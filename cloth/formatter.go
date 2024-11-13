@@ -1,17 +1,15 @@
 package cloth
 
 type ClothFormatter struct {
-	ID          int    `json:"id"`
-	UserID      int    `json:"user_id"`
-	MaterialID  int    `json:"material_id"`
-	SupplierID  int    `json:"supplier_id"`
-	Name        string `json:"name"`
-	Price       string `json:"price"`
-	Description string `json:"description"`
-	Size        string `json:"size"`
-	Stock       int    `json:"stock"`
-	Color       string `json:"color"`
-	ImageURL    string `json:"image_url"`
+	ID          int         `json:"id"`
+	UserID      int         `json:"user_id"`
+	MaterialID  int         `json:"material_id"`
+	SupplierID  int         `json:"supplier_id"`
+	Name        string      `json:"name"`
+	Price       string      `json:"price"`
+	Description string      `json:"description"`
+	ImageURL    string      `json:"image_url"`
+	Variations  interface{} `json:"variations"`
 }
 
 func FormatCloth(cloth Cloth) ClothFormatter {
@@ -23,14 +21,13 @@ func FormatCloth(cloth Cloth) ClothFormatter {
 	clothFormatter.Name = cloth.Name
 	clothFormatter.Price = cloth.Price
 	clothFormatter.Description = cloth.Description
-	clothFormatter.Size = cloth.Size
-	clothFormatter.Stock = cloth.Stock
-	clothFormatter.Color = cloth.Color
 	clothFormatter.ImageURL = ""
 
 	if len(cloth.ClothImages) > 0 {
 		clothFormatter.ImageURL = cloth.ClothImages[0].FileName
 	}
+
+	clothFormatter.Variations = "Success"
 
 	return clothFormatter
 }
@@ -38,8 +35,8 @@ func FormatCloth(cloth Cloth) ClothFormatter {
 func FormatCloths(cloths []Cloth) []ClothFormatter {
 	clothsFormatter := []ClothFormatter{}
 
-	for _, supplier := range cloths {
-		clothFormatter := FormatCloth(supplier)
+	for _, cloth := range cloths {
+		clothFormatter := FormatCloth(cloth)
 		clothsFormatter = append(clothsFormatter, clothFormatter)
 	}
 
@@ -47,32 +44,18 @@ func FormatCloths(cloths []Cloth) []ClothFormatter {
 }
 
 type ClothDetailFormatter struct {
-	ID          int                    `json:"id"`
-	UserID      int                    `json:"user_id"`
-	MaterialID  int                    `json:"material_id"`
-	SupplierID  int                    `json:"supplier_id"`
-	Name        string                 `json:"name"`
-	Price       string                 `json:"price"`
-	Description string                 `json:"description"`
-	Size        string                 `json:"size"`
-	Color       string                 `json:"color"`
-	Stock       int                    `json:"stock"`
-	User        ClothUserFormatter     `json:"user"`
-	Material    ClothMaterialFormatter `json:"material"`
-	Supplier    ClothSupplierFormatter `json:"supplier"`
-	Images      []ClothImageFormatter  `json:"images"`
-}
-
-type ClothUserFormatter struct {
-	Name string `json:"name"`
+	ID          int                       `json:"id"`
+	MaterialID  int                       `json:"material_id"`
+	Name        string                    `json:"name"`
+	Price       string                    `json:"price"`
+	Description string                    `json:"description"`
+	Material    ClothMaterialFormatter    `json:"material"`
+	Images      []ClothImageFormatter     `json:"images"`
+	Variations  []ClothVariationFormatter `json:"variations"`
 }
 
 type ClothMaterialFormatter struct {
 	MaterialName string `json:"material_name"`
-}
-
-type ClothSupplierFormatter struct {
-	Name string `json:"name"`
 }
 
 type ClothImageFormatter struct {
@@ -80,34 +63,35 @@ type ClothImageFormatter struct {
 	IsPrimary bool   `json:"is_primary"`
 }
 
+type ClothVariationFormatter struct {
+	Size  string `json:"size"`
+	Stock int    `json:"stock"`
+	Color string `json:"color"`
+}
+
 func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 	clothDetailFormatter := ClothDetailFormatter{}
 	clothDetailFormatter.ID = cloth.ID
-	clothDetailFormatter.UserID = cloth.UserID
 	clothDetailFormatter.MaterialID = cloth.MaterialID
-	clothDetailFormatter.SupplierID = cloth.SupplierID
 	clothDetailFormatter.Name = cloth.Name
 	clothDetailFormatter.Price = cloth.Price
-	clothDetailFormatter.Color = cloth.Color
-	clothDetailFormatter.Stock = cloth.Stock
-	clothDetailFormatter.Size = cloth.Size
 	clothDetailFormatter.Description = cloth.Description
-
-	user := cloth.User
-	clothUserFormatter := ClothUserFormatter{}
-	clothUserFormatter.Name = user.Name
 
 	material := cloth.Material
 	clothMaterialFormatter := ClothMaterialFormatter{}
 	clothMaterialFormatter.MaterialName = material.MaterialName
 
-	supplier := cloth.Supplier
-	clothSupplierFormatter := ClothSupplierFormatter{}
-	clothSupplierFormatter.Name = supplier.Name
-
-	clothDetailFormatter.User = clothUserFormatter
 	clothDetailFormatter.Material = clothMaterialFormatter
-	clothDetailFormatter.Supplier = clothSupplierFormatter
+
+	for _, variation := range cloth.Variation {
+		clothVariationFormatter := ClothVariationFormatter{
+			Color: variation.Color,
+			Size:  variation.Size,
+			Stock: variation.Stock,
+		}
+
+		clothDetailFormatter.Variations = append(clothDetailFormatter.Variations, clothVariationFormatter)
+	}
 
 	images := []ClothImageFormatter{}
 
@@ -152,6 +136,13 @@ func UpdatedFormatCloth(updatedCloth Cloth, oldCloth Cloth) map[string]interface
 	if oldCloth.Description != updatedCloth.Description {
 		updatedFields["description"] = updatedCloth.Description
 	}
+
+	return updatedFields
+}
+
+func UpdatedClothVariationFormatCloth(updatedCloth ClothVariation, oldCloth ClothVariation) map[string]interface{} {
+	updatedFields := make(map[string]interface{})
+
 	if oldCloth.Size != updatedCloth.Size {
 		updatedFields["size"] = updatedCloth.Size
 	}
@@ -160,24 +151,6 @@ func UpdatedFormatCloth(updatedCloth Cloth, oldCloth Cloth) map[string]interface
 	}
 	if oldCloth.Stock != updatedCloth.Stock {
 		updatedFields["stock"] = updatedCloth.Stock
-	}
-
-	return updatedFields
-}
-
-func UpdateFormatClothImage(updatedClothImage ClothImage, oldClothImage ClothImage) map[string]interface{} {
-	updatedFields := make(map[string]interface{})
-
-	if oldClothImage.ClothID != updatedClothImage.ClothID {
-		updatedFields["cloth_id"] = updatedClothImage.ClothID
-	}
-
-	if oldClothImage.IsPrimary != updatedClothImage.IsPrimary {
-		updatedFields["is_primary"] = updatedClothImage.IsPrimary
-	}
-
-	if oldClothImage.FileName != updatedClothImage.FileName {
-		updatedFields["file"] = updatedClothImage.FileName
 	}
 
 	return updatedFields

@@ -13,17 +13,29 @@ type Cloth struct {
 	SupplierID  int
 	MaterialID  int
 	Name        string
-	Color       string
 	Price       string
-	Size        string
 	Description string
-	Stock       int
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 	ClothImages []ClothImage
 	User        user.User
 	Material    material.Material
 	Supplier    supplier.Supplier
+	Variation   []ClothVariation
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type ClothVariation struct {
+	ID        int
+	ClothID   int
+	Size      string
+	Stock     int
+	Color     string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (ClothVariation) TableName() string {
+	return "ClothVariations"
 }
 
 type ClothImage struct {
@@ -33,4 +45,8 @@ type ClothImage struct {
 	IsPrimary int
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+func (ClothImage) TableName() string {
+	return "ClothImages"
 }

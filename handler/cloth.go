@@ -125,6 +125,49 @@ func (h *clothHandler) UpdateClothByID(c *gin.Context) {
 
 }
 
+func (h *clothHandler) UpdateClothVariationByID(c *gin.Context) {
+	var inputID cloth.ClothInputDetail
+
+	err := c.ShouldBindUri(&inputID)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to get cloth variation", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	var inputData cloth.UpdateClothVariationInput
+	err = c.ShouldBindJSON(&inputData)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Failed to update cloth variation", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	oldCloth, err := h.service.FindClothVariationByID(inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed to find cloth variation", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	updatedClothVariation, err := h.service.UpdateClothVariationByID(inputID, inputData)
+	if err != nil {
+		response := helper.APIResponse("Failed to updated cloth variation", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("Success to updated cloth variation", http.StatusOK, "success", cloth.UpdatedClothVariationFormatCloth(updatedClothVariation, oldCloth))
+	c.JSON(http.StatusOK, response)
+
+}
+
 func (h *clothHandler) DeleteClothByID(c *gin.Context) {
 	var inputID cloth.ClothInputDetail
 
@@ -133,19 +176,19 @@ func (h *clothHandler) DeleteClothByID(c *gin.Context) {
 		errors := helper.FormatValidationError(err)
 		errorMessage := gin.H{"errors": errors}
 
-		response := helper.APIResponse("Failed to get supplier", http.StatusUnprocessableEntity, "error", errorMessage)
+		response := helper.APIResponseDelete("Failed to get supplier", http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
 	deletedCloth, err := h.service.DeleteClothByID(inputID)
 	if err != nil {
-		response := helper.APIResponse("Failed to deleted cloth", http.StatusBadRequest, "error", nil)
+		response := helper.APIResponseDelete("Failed to deleted cloth", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	response := helper.APIResponse("Success to deleted cloth", http.StatusOK, "success", deletedCloth)
+	response := helper.APIResponseDelete("Success to deleted cloth", http.StatusOK, "success", deletedCloth)
 	c.JSON(http.StatusOK, response)
 
 }
