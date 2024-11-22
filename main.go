@@ -51,7 +51,7 @@ func main() {
 	router.Static("/images", "./images")
 	api := router.Group("/api/v1")
 
-	api.POST("/users", userHandler.RegisterUser)
+	api.POST("/register", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.LoginUser)
 	api.GET("/cloths", clothHandler.FindAllCloth)
 	api.GET("/cloths/:id", clothHandler.FindClothByID)
@@ -79,6 +79,7 @@ func main() {
 		protectedRoutes.GET("/cloths/:userId/transactions/:id", transactionHandler.GetTransactionUserIDByID)
 		protectedRoutes.GET("/cloths/transactions", middleware.RoleMiddleware("admin"), transactionHandler.FindAllTransaction)
 		protectedRoutes.GET("/cloths/transactions/:id", middleware.RoleMiddleware("admin"), transactionHandler.GetTransactionByID)
+		protectedRoutes.POST("/transactions/notification", transactionHandler.GetNotification)
 	}
 
 	router.Run()
