@@ -53,6 +53,8 @@ func main() {
 
 	api.POST("/register", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.LoginUser)
+	api.GET("/sessions/oauth", userHandler.GetLoginGoogleURL)
+	api.GET("/sessions/oauth/callback", userHandler.CallbackHandler)
 	api.GET("/cloths", clothHandler.FindAllCloth)
 	api.GET("/cloths/:id", clothHandler.FindClothByID)
 

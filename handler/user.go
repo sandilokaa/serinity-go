@@ -4,6 +4,10 @@ import (
 	"cheggstore/auth"
 	"cheggstore/helper"
 	"cheggstore/user"
+	"cheggstore/user/oauth"
+	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -91,4 +95,42 @@ func (h *userHandler) CurrentUser(c *gin.Context) {
 	formatter := user.FormatUser(currentUser, "")
 	response := helper.APIResponse("Successfully fetch user data", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) GetLoginGoogleURL(c *gin.Context) {
+	state := helper.GenerateStateOauth()
+	url := oauth.GetLoginGoogleURL(state)
+	fmt.Println("Redirecting to URL:", url)
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (h *userHandler) CallbackHandler(c *gin.Context) {
+	code := helper.GenerateRandomCodeOauth(20)
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Code not found"})
+		return
+	}
+
+	ctx := context.Background()
+	token, err := oauth.GetGoogleOauthConfig().Exchange(ctx, code)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token: " + err.Error()})
+		return
+	}
+
+	client := oauth.GetGoogleOauthConfig().Client(ctx, token)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo.email")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info: " + err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	var userInfo map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode user info: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, userInfo)
 }
