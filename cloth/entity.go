@@ -1,6 +1,7 @@
 package cloth
 
 import (
+	"cheggstore/category"
 	"cheggstore/material"
 	"cheggstore/supplier"
 	"cheggstore/user"
@@ -12,6 +13,7 @@ type Cloth struct {
 	UserID      int
 	SupplierID  int
 	MaterialID  int
+	CategoryID  int
 	Name        string
 	Price       string
 	Description string
@@ -19,6 +21,7 @@ type Cloth struct {
 	User        user.User
 	Material    material.Material
 	Supplier    supplier.Supplier
+	Category    category.Category
 	Variation   []ClothVariation
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

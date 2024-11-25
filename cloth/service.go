@@ -29,6 +29,7 @@ func (s *service) SaveCloth(input CreateClothInput) (Cloth, error) {
 	cloth.UserID = input.User.ID
 	cloth.MaterialID = input.MaterialID
 	cloth.SupplierID = input.SupplierID
+	cloth.CategoryID = input.CategoryID
 
 	newCloth, err := s.repository.SaveCloth(cloth)
 	if err != nil {
@@ -104,6 +105,10 @@ func (s *service) UpdateClothByID(inputID ClothInputDetail, inputData UpdateClot
 
 	if inputData.SupplierID != 0 {
 		cloth.SupplierID = inputData.SupplierID
+	}
+
+	if inputData.CategoryID != 0 {
+		cloth.CategoryID = inputData.CategoryID
 	}
 
 	updatedCloth, err := s.repository.UpdateClothByID(cloth)

@@ -5,6 +5,7 @@ type ClothFormatter struct {
 	UserID      int         `json:"user_id"`
 	MaterialID  int         `json:"material_id"`
 	SupplierID  int         `json:"supplier_id"`
+	CategoryID  int         `json:"category_id"`
 	Name        string      `json:"name"`
 	Price       string      `json:"price"`
 	Description string      `json:"description"`
@@ -18,6 +19,7 @@ func FormatCloth(cloth Cloth) ClothFormatter {
 	clothFormatter.UserID = cloth.UserID
 	clothFormatter.MaterialID = cloth.MaterialID
 	clothFormatter.SupplierID = cloth.SupplierID
+	clothFormatter.CategoryID = cloth.CategoryID
 	clothFormatter.Name = cloth.Name
 	clothFormatter.Price = cloth.Price
 	clothFormatter.Description = cloth.Description
@@ -45,17 +47,21 @@ func FormatCloths(cloths []Cloth) []ClothFormatter {
 
 type ClothDetailFormatter struct {
 	ID          int                       `json:"id"`
-	MaterialID  int                       `json:"material_id"`
 	Name        string                    `json:"name"`
 	Price       string                    `json:"price"`
 	Description string                    `json:"description"`
 	Material    ClothMaterialFormatter    `json:"material"`
+	Category    ClothCategoryFormatter    `json:"category"`
 	Images      []ClothImageFormatter     `json:"images"`
 	Variations  []ClothVariationFormatter `json:"variations"`
 }
 
 type ClothMaterialFormatter struct {
 	MaterialName string `json:"material_name"`
+}
+
+type ClothCategoryFormatter struct {
+	Category string `json:"category"`
 }
 
 type ClothImageFormatter struct {
@@ -72,7 +78,6 @@ type ClothVariationFormatter struct {
 func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 	clothDetailFormatter := ClothDetailFormatter{}
 	clothDetailFormatter.ID = cloth.ID
-	clothDetailFormatter.MaterialID = cloth.MaterialID
 	clothDetailFormatter.Name = cloth.Name
 	clothDetailFormatter.Price = cloth.Price
 	clothDetailFormatter.Description = cloth.Description
@@ -82,6 +87,12 @@ func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 	clothMaterialFormatter.MaterialName = material.MaterialName
 
 	clothDetailFormatter.Material = clothMaterialFormatter
+
+	category := cloth.Category
+	clothCategoryFormatter := ClothCategoryFormatter{}
+	clothCategoryFormatter.Category = category.Category
+
+	clothDetailFormatter.Category = clothCategoryFormatter
 
 	for _, variation := range cloth.Variation {
 		clothVariationFormatter := ClothVariationFormatter{
@@ -126,6 +137,9 @@ func UpdatedFormatCloth(updatedCloth Cloth, oldCloth Cloth) map[string]interface
 	}
 	if oldCloth.SupplierID != updatedCloth.SupplierID {
 		updatedFields["supplier_id"] = updatedCloth.SupplierID
+	}
+	if oldCloth.CategoryID != updatedCloth.CategoryID {
+		updatedFields["category_id"] = updatedCloth.CategoryID
 	}
 	if oldCloth.Name != updatedCloth.Name {
 		updatedFields["name"] = updatedCloth.Name

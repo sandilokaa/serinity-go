@@ -98,14 +98,14 @@ func (h *userHandler) CurrentUser(c *gin.Context) {
 }
 
 func (h *userHandler) GetLoginGoogleURL(c *gin.Context) {
-	state := helper.GenerateStateOauth()
+	state := c.Query("state")
 	url := oauth.GetLoginGoogleURL(state)
 	fmt.Println("Redirecting to URL:", url)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (h *userHandler) CallbackHandler(c *gin.Context) {
-	code := helper.GenerateRandomCodeOauth(20)
+	code := c.Query("code")
 	if code == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Code not found"})
 		return
@@ -119,7 +119,7 @@ func (h *userHandler) CallbackHandler(c *gin.Context) {
 	}
 
 	client := oauth.GetGoogleOauthConfig().Client(ctx, token)
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo.email")
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info: " + err.Error()})
 		return

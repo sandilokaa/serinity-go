@@ -2,6 +2,7 @@ package main
 
 import (
 	"cheggstore/auth"
+	"cheggstore/category"
 	"cheggstore/cloth"
 	"cheggstore/handler"
 	"cheggstore/material"
@@ -29,6 +30,7 @@ func main() {
 	userRepository := user.NewRepository(db)
 	materialRepository := material.NewRepository(db)
 	supplierRepository := supplier.NewRepository(db)
+	categoryRepository := category.NewRepository(db)
 	clothRepository := cloth.NewRepository(db)
 	transactionRepository := transaction.NewRepository(db)
 
@@ -36,6 +38,7 @@ func main() {
 	authService := auth.NewService()
 	materialService := material.NewService(materialRepository)
 	supplierService := supplier.NewService(supplierRepository)
+	categoryService := category.NewService(categoryRepository)
 	clothService := cloth.NewService(clothRepository)
 	paymentService := payment.NewService()
 	transactionService := transaction.NewService(transactionRepository, clothRepository, paymentService)
@@ -43,6 +46,7 @@ func main() {
 	userHandler := handler.NewHandler(userService, authService)
 	materialHandler := handler.NewMaterialHandler(materialService)
 	supplierHandler := handler.NewSupplierHandler(supplierService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
 	clothHandler := handler.NewClothHandler(clothService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
 
@@ -71,6 +75,11 @@ func main() {
 		protectedRoutes.POST("/suppliers", middleware.RoleMiddleware("admin"), supplierHandler.CreateSupplier)
 		protectedRoutes.PUT("/suppliers/:id", middleware.RoleMiddleware("admin"), supplierHandler.UpdateSupplierByID)
 		protectedRoutes.DELETE("/suppliers/:id", middleware.RoleMiddleware("admin"), supplierHandler.DeleteSupplierByID)
+		protectedRoutes.GET("/categories", middleware.RoleMiddleware("admin"), categoryHandler.FindAllCategory)
+		protectedRoutes.GET("/categories/:id", middleware.RoleMiddleware("admin"), categoryHandler.FindCategoryByID)
+		protectedRoutes.POST("/categories", middleware.RoleMiddleware("admin"), categoryHandler.CreateCategory)
+		protectedRoutes.PUT("/categories/:id", middleware.RoleMiddleware("admin"), categoryHandler.UpdateCategoryByID)
+		protectedRoutes.DELETE("/categories/:id", middleware.RoleMiddleware("admin"), categoryHandler.DeleteCategoryByID)
 		protectedRoutes.POST("/cloths", middleware.RoleMiddleware("admin"), clothHandler.SaveCloth)
 		protectedRoutes.PUT("/cloths/:id", middleware.RoleMiddleware("admin"), clothHandler.UpdateClothByID)
 		protectedRoutes.PUT("/cloths/variation/:id", middleware.RoleMiddleware("admin"), clothHandler.UpdateClothVariationByID)

@@ -29,5 +29,6 @@ func GetGoogleOauthConfig() *oauth2.Config {
 }
 
 func GetLoginGoogleURL(state string) string {
-	return googleOauthConfig.AuthCodeURL(state)
+	url := googleOauthConfig.AuthCodeURL(state)
+	return url
 }

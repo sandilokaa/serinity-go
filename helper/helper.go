@@ -75,30 +75,3 @@ func GenerateTransactionCode() string {
 
 	return transactionCode
 }
-
-func GenerateStateOauth() string {
-	source := rand.NewSource(time.Now().UnixNano())
-	rng := rand.New(source)
-
-	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	stateLength := 32
-	state := make([]byte, stateLength)
-
-	for i := range state {
-		state[i] = charset[rng.Intn(len(charset))]
-	}
-
-	return string(state)
-}
-
-func GenerateRandomCodeOauth(length int) string {
-	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	code := make([]byte, length)
-	for i := range code {
-		code[i] = charset[rng.Intn(len(charset))]
-	}
-
-	return string(code)
-}
