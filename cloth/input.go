@@ -12,6 +12,8 @@ type CreateClothInput struct {
 	Name        string                `json:"name" binding:"required"`
 	Price       string                `json:"price" binding:"required"`
 	Description string                `json:"description" binding:"required"`
+	Sale        bool                  `json:"sale"`
+	NewArrival  bool                  `json:"new_arrival"`
 	Variations  []ClothVariationInput `json:"variations"`
 }
 
@@ -34,6 +36,8 @@ type UpdateClothInput struct {
 	Color       string `json:"color"`
 	Price       string `json:"price"`
 	Description string `json:"description"`
+	Sale        bool   `json:"sale"`
+	NewArrival  bool   `json:"new_arrival"`
 	Size        string `json:"size"`
 	Stock       int    `json:"stock"`
 }

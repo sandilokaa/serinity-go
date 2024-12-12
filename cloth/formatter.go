@@ -9,6 +9,8 @@ type ClothFormatter struct {
 	Name        string      `json:"name"`
 	Price       string      `json:"price"`
 	Description string      `json:"description"`
+	Sale        bool        `json:"sale"`
+	NewArrival  bool        `json:"new_arrival"`
 	ImageURL    string      `json:"image_url"`
 	Variations  interface{} `json:"variations"`
 }
@@ -23,6 +25,8 @@ func FormatCloth(cloth Cloth) ClothFormatter {
 	clothFormatter.Name = cloth.Name
 	clothFormatter.Price = cloth.Price
 	clothFormatter.Description = cloth.Description
+	clothFormatter.Sale = cloth.Sale
+	clothFormatter.NewArrival = cloth.NewArrival
 	clothFormatter.ImageURL = ""
 
 	if len(cloth.ClothImages) > 0 {
@@ -50,6 +54,8 @@ type ClothDetailFormatter struct {
 	Name        string                    `json:"name"`
 	Price       string                    `json:"price"`
 	Description string                    `json:"description"`
+	Sale        bool                      `json:"sale"`
+	NewArrival  bool                      `json:"new_arrival"`
 	Material    ClothMaterialFormatter    `json:"material"`
 	Category    ClothCategoryFormatter    `json:"category"`
 	Images      []ClothImageFormatter     `json:"images"`
@@ -81,6 +87,8 @@ func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 	clothDetailFormatter.Name = cloth.Name
 	clothDetailFormatter.Price = cloth.Price
 	clothDetailFormatter.Description = cloth.Description
+	clothDetailFormatter.Sale = cloth.Sale
+	clothDetailFormatter.NewArrival = cloth.NewArrival
 
 	material := cloth.Material
 	clothMaterialFormatter := ClothMaterialFormatter{}
@@ -149,6 +157,12 @@ func UpdatedFormatCloth(updatedCloth Cloth, oldCloth Cloth) map[string]interface
 	}
 	if oldCloth.Description != updatedCloth.Description {
 		updatedFields["description"] = updatedCloth.Description
+	}
+	if oldCloth.Sale != updatedCloth.Sale {
+		updatedFields["sale"] = updatedCloth.Sale
+	}
+	if oldCloth.NewArrival != updatedCloth.NewArrival {
+		updatedFields["new_arrival"] = updatedCloth.NewArrival
 	}
 
 	return updatedFields

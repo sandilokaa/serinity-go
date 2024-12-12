@@ -17,6 +17,8 @@ type Cloth struct {
 	Name        string
 	Price       string
 	Description string
+	Sale        bool
+	NewArrival  bool
 	ClothImages []ClothImage
 	User        user.User
 	Material    material.Material

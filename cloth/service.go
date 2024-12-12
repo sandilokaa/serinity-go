@@ -26,6 +26,8 @@ func (s *service) SaveCloth(input CreateClothInput) (Cloth, error) {
 	cloth.Name = input.Name
 	cloth.Price = input.Price
 	cloth.Description = input.Description
+	cloth.Sale = input.Sale
+	cloth.NewArrival = input.NewArrival
 	cloth.UserID = input.User.ID
 	cloth.MaterialID = input.MaterialID
 	cloth.SupplierID = input.SupplierID
@@ -97,6 +99,14 @@ func (s *service) UpdateClothByID(inputID ClothInputDetail, inputData UpdateClot
 
 	if inputData.Description != "" {
 		cloth.Description = inputData.Description
+	}
+
+	if inputData.Sale {
+		cloth.Sale = inputData.Sale
+	}
+
+	if inputData.NewArrival {
+		cloth.NewArrival = inputData.NewArrival
 	}
 
 	if inputData.MaterialID != 0 {
