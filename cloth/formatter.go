@@ -1,39 +1,37 @@
 package cloth
 
 type ClothFormatter struct {
-	ID          int         `json:"id"`
-	UserID      int         `json:"user_id"`
-	MaterialID  int         `json:"material_id"`
-	SupplierID  int         `json:"supplier_id"`
-	CategoryID  int         `json:"category_id"`
-	Name        string      `json:"name"`
-	Price       string      `json:"price"`
-	Description string      `json:"description"`
-	Sale        bool        `json:"sale"`
-	NewArrival  bool        `json:"new_arrival"`
-	ImageURL    string      `json:"image_url"`
-	Variations  interface{} `json:"variations"`
+	ID         int                    `json:"id"`
+	Name       string                 `json:"name"`
+	Price      string                 `json:"price"`
+	Sale       bool                   `json:"sale"`
+	NewArrival bool                   `json:"new_arrival"`
+	ImageURL   string                 `json:"image_url"`
+	Category   ClothCategoryFormatter `json:"category"`
+}
+
+type ClothCategoryFormatter struct {
+	Category string `json:"category"`
 }
 
 func FormatCloth(cloth Cloth) ClothFormatter {
 	clothFormatter := ClothFormatter{}
 	clothFormatter.ID = cloth.ID
-	clothFormatter.UserID = cloth.UserID
-	clothFormatter.MaterialID = cloth.MaterialID
-	clothFormatter.SupplierID = cloth.SupplierID
-	clothFormatter.CategoryID = cloth.CategoryID
 	clothFormatter.Name = cloth.Name
 	clothFormatter.Price = cloth.Price
-	clothFormatter.Description = cloth.Description
 	clothFormatter.Sale = cloth.Sale
 	clothFormatter.NewArrival = cloth.NewArrival
 	clothFormatter.ImageURL = ""
 
+	category := cloth.Category
+	clothCategoryFormatter := ClothCategoryFormatter{}
+	clothCategoryFormatter.Category = category.Category
+
+	clothFormatter.Category = clothCategoryFormatter
+
 	if len(cloth.ClothImages) > 0 {
 		clothFormatter.ImageURL = cloth.ClothImages[0].FileName
 	}
-
-	clothFormatter.Variations = "Success"
 
 	return clothFormatter
 }
@@ -50,32 +48,32 @@ func FormatCloths(cloths []Cloth) []ClothFormatter {
 }
 
 type ClothDetailFormatter struct {
-	ID          int                       `json:"id"`
-	Name        string                    `json:"name"`
-	Price       string                    `json:"price"`
-	Description string                    `json:"description"`
-	Sale        bool                      `json:"sale"`
-	NewArrival  bool                      `json:"new_arrival"`
-	Material    ClothMaterialFormatter    `json:"material"`
-	Category    ClothCategoryFormatter    `json:"category"`
-	Images      []ClothImageFormatter     `json:"images"`
-	Variations  []ClothVariationFormatter `json:"variations"`
+	ID          int                             `json:"id"`
+	Name        string                          `json:"name"`
+	Price       string                          `json:"price"`
+	Description string                          `json:"description"`
+	Sale        bool                            `json:"sale"`
+	NewArrival  bool                            `json:"new_arrival"`
+	Material    ClothDetailMaterialFormatter    `json:"material"`
+	Category    ClothDetailCategoryFormatter    `json:"category"`
+	Images      []ClothDetailImageFormatter     `json:"images"`
+	Variations  []ClothDetailVariationFormatter `json:"variations"`
 }
 
-type ClothMaterialFormatter struct {
+type ClothDetailMaterialFormatter struct {
 	MaterialName string `json:"material_name"`
 }
 
-type ClothCategoryFormatter struct {
+type ClothDetailCategoryFormatter struct {
 	Category string `json:"category"`
 }
 
-type ClothImageFormatter struct {
+type ClothDetailImageFormatter struct {
 	ImageUrl  string `json:"image_url"`
 	IsPrimary bool   `json:"is_primary"`
 }
 
-type ClothVariationFormatter struct {
+type ClothDetailVariationFormatter struct {
 	Size  string `json:"size"`
 	Stock int    `json:"stock"`
 	Color string `json:"color"`
@@ -91,19 +89,19 @@ func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 	clothDetailFormatter.NewArrival = cloth.NewArrival
 
 	material := cloth.Material
-	clothMaterialFormatter := ClothMaterialFormatter{}
+	clothMaterialFormatter := ClothDetailMaterialFormatter{}
 	clothMaterialFormatter.MaterialName = material.MaterialName
 
 	clothDetailFormatter.Material = clothMaterialFormatter
 
 	category := cloth.Category
-	clothCategoryFormatter := ClothCategoryFormatter{}
+	clothCategoryFormatter := ClothDetailCategoryFormatter{}
 	clothCategoryFormatter.Category = category.Category
 
 	clothDetailFormatter.Category = clothCategoryFormatter
 
 	for _, variation := range cloth.Variation {
-		clothVariationFormatter := ClothVariationFormatter{
+		clothVariationFormatter := ClothDetailVariationFormatter{
 			Color: variation.Color,
 			Size:  variation.Size,
 			Stock: variation.Stock,
@@ -112,10 +110,10 @@ func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 		clothDetailFormatter.Variations = append(clothDetailFormatter.Variations, clothVariationFormatter)
 	}
 
-	images := []ClothImageFormatter{}
+	images := []ClothDetailImageFormatter{}
 
 	for _, image := range cloth.ClothImages {
-		clothImageFormatter := ClothImageFormatter{}
+		clothImageFormatter := ClothDetailImageFormatter{}
 		clothImageFormatter.ImageUrl = image.FileName
 
 		isPrimary := false

@@ -4,7 +4,7 @@ import "errors"
 
 type Service interface {
 	SaveCloth(input CreateClothInput) (Cloth, error)
-	FindAllCloth(search string) ([]Cloth, error)
+	FindAllCloth(name string, category string) ([]Cloth, error)
 	FindClothByID(input ClothInputDetail) (Cloth, error)
 	FindClothVariationByID(input ClothInputDetail) (ClothVariation, error)
 	UpdateClothByID(inputID ClothInputDetail, inputData UpdateClothInput) (Cloth, error)
@@ -40,6 +40,7 @@ func (s *service) SaveCloth(input CreateClothInput) (Cloth, error) {
 
 	for _, variation := range input.Variations {
 		clothVariation := ClothVariation{
+			UserID:  newCloth.UserID,
 			ClothID: newCloth.ID,
 			Size:    variation.Size,
 			Color:   variation.Color,
@@ -55,8 +56,8 @@ func (s *service) SaveCloth(input CreateClothInput) (Cloth, error) {
 	return newCloth, nil
 }
 
-func (s *service) FindAllCloth(search string) ([]Cloth, error) {
-	cloths, err := s.repository.FindAllCloth(search)
+func (s *service) FindAllCloth(name string, category string) ([]Cloth, error) {
+	cloths, err := s.repository.FindAllCloth(name, category)
 	if err != nil {
 		return cloths, err
 	}

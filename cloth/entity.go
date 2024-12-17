@@ -31,6 +31,7 @@ type Cloth struct {
 
 type ClothVariation struct {
 	ID        int
+	UserID    int
 	ClothID   int
 	Size      string
 	Stock     int

@@ -48,9 +48,10 @@ func (h *clothHandler) SaveCloth(c *gin.Context) {
 
 func (h *clothHandler) FindAllCloth(c *gin.Context) {
 
-	search := c.Query("search")
+	name := c.Query("name")
+	category := c.Query("category")
 
-	cloths, err := h.service.FindAllCloth(search)
+	cloths, err := h.service.FindAllCloth(name, category)
 	if err != nil {
 		response := helper.APIResponse("Failed to find cloth", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)

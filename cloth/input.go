@@ -18,6 +18,7 @@ type CreateClothInput struct {
 }
 
 type ClothVariationInput struct {
+	User  user.User
 	Size  string `json:"size" binding:"required"`
 	Stock int    `json:"stock" binding:"required"`
 	Color string `json:"color" binding:"required"`

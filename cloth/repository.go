@@ -8,7 +8,7 @@ import (
 type Repository interface {
 	SaveCloth(cloth Cloth) (Cloth, error)
 	SaveClothVariation(clothVariation ClothVariation) (ClothVariation, error)
-	FindAllCloth(search string) ([]Cloth, error)
+	FindAllCloth(name string, category string) ([]Cloth, error)
 	FindClothByID(ID int) (Cloth, error)
 	FindClothVariationByID(ID int) (ClothVariation, error)
 	UpdateClothByID(cloth Cloth) (Cloth, error)
@@ -46,15 +46,21 @@ func (r *repository) SaveClothVariation(clothVariation ClothVariation) (ClothVar
 	return clothVariation, nil
 }
 
-func (r *repository) FindAllCloth(search string) ([]Cloth, error) {
+func (r *repository) FindAllCloth(name string, category string) ([]Cloth, error) {
 	var cloths []Cloth
 
-	query := r.db
-	if search != "" {
-		query = query.Preload("ClothImages", "ClothImages.is_primary = 1").Where("name LIKE ?", "%"+search+"%")
+	query := r.db.Preload("ClothImages", "ClothImages.is_primary = 1").Preload("Category")
+
+	if name != "" {
+		query = query.Where("name LIKE ?", "%"+name+"%")
 	}
 
-	err := query.Preload("ClothImages", "ClothImages.is_primary = 1").Find(&cloths).Error
+	if category != "" {
+		query = query.Joins("JOIN categories ON categories.id = cloths.category_id").
+			Where("categories.category LIKE ?", "%"+category+"%")
+	}
+
+	err := query.Find(&cloths).Error
 	if err != nil {
 		return cloths, err
 	}
