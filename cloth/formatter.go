@@ -55,6 +55,7 @@ type ClothDetailFormatter struct {
 	Sale        bool                            `json:"sale"`
 	NewArrival  bool                            `json:"new_arrival"`
 	Material    ClothDetailMaterialFormatter    `json:"material"`
+	SizeChart   ClothDetailSizeChartFormatter   `json:"size_chart"`
 	Category    ClothDetailCategoryFormatter    `json:"category"`
 	Images      []ClothDetailImageFormatter     `json:"images"`
 	Variations  []ClothDetailVariationFormatter `json:"variations"`
@@ -71,6 +72,11 @@ type ClothDetailCategoryFormatter struct {
 type ClothDetailImageFormatter struct {
 	ImageUrl  string `json:"image_url"`
 	IsPrimary bool   `json:"is_primary"`
+}
+
+type ClothDetailSizeChartFormatter struct {
+	Name     string `json:"name"`
+	FileName string `json:"file_name"`
 }
 
 type ClothDetailVariationFormatter struct {
@@ -99,6 +105,13 @@ func (c *Cloth) FormatClothDetail(cloth Cloth) ClothDetailFormatter {
 	clothCategoryFormatter.Category = category.Category
 
 	clothDetailFormatter.Category = clothCategoryFormatter
+
+	sizechart := cloth.SizeChart
+	sizeChartFormatter := ClothDetailSizeChartFormatter{}
+	sizeChartFormatter.Name = sizechart.Name
+	sizeChartFormatter.FileName = sizechart.FileName
+
+	clothDetailFormatter.SizeChart = sizeChartFormatter
 
 	for _, variation := range cloth.Variation {
 		clothVariationFormatter := ClothDetailVariationFormatter{
@@ -146,6 +159,9 @@ func UpdatedFormatCloth(updatedCloth Cloth, oldCloth Cloth) map[string]interface
 	}
 	if oldCloth.CategoryID != updatedCloth.CategoryID {
 		updatedFields["category_id"] = updatedCloth.CategoryID
+	}
+	if oldCloth.SizeChartID != updatedCloth.SizeChartID {
+		updatedFields["size_chart_id"] = updatedCloth.SizeChartID
 	}
 	if oldCloth.Name != updatedCloth.Name {
 		updatedFields["name"] = updatedCloth.Name

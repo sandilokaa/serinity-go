@@ -9,6 +9,7 @@ type CreateClothInput struct {
 	MaterialID  int                   `json:"material_id" binding:"required"`
 	SupplierID  int                   `json:"supplier_id" binding:"required"`
 	CategoryID  int                   `json:"category_id" binding:"required"`
+	SizeChartID int                   `json:"size_chart_id" binding:"required"`
 	Name        string                `json:"name" binding:"required"`
 	Price       string                `json:"price" binding:"required"`
 	Description string                `json:"description" binding:"required"`
@@ -33,6 +34,7 @@ type UpdateClothInput struct {
 	MaterialID  int    `json:"material_id"`
 	SupplierID  int    `json:"supplier_id"`
 	CategoryID  int    `json:"category_id"`
+	SizeChartID int    `json:"size_chart_id"`
 	Name        string `json:"name"`
 	Color       string `json:"color"`
 	Price       string `json:"price"`
