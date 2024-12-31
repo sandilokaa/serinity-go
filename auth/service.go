@@ -2,8 +2,10 @@ package auth
 
 import (
 	"errors"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
 type Service interface {
@@ -23,6 +25,8 @@ var SECRET_KEY = []byte("Ch39g_s3cr3Y_k3Y")
 func (s *jwtService) GenerateToken(userID int) (string, error) {
 	claim := jwt.MapClaims{}
 	claim["user_id"] = userID
+	claim["iat"] = time.Now().Unix()
+	claim["jti"] = uuid.New().String()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
