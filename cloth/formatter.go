@@ -6,8 +6,13 @@ type ClothFormatter struct {
 	Price      string                 `json:"price"`
 	Sale       bool                   `json:"sale"`
 	NewArrival bool                   `json:"new_arrival"`
-	ImageURL   string                 `json:"image_url"`
+	Images     []ClothImageFormatter  `json:"images"`
 	Category   ClothCategoryFormatter `json:"category"`
+}
+
+type ClothImageFormatter struct {
+	ImageUrl  string `json:"image_url"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 type ClothCategoryFormatter struct {
@@ -21,7 +26,6 @@ func FormatCloth(cloth Cloth) ClothFormatter {
 	clothFormatter.Price = cloth.Price
 	clothFormatter.Sale = cloth.Sale
 	clothFormatter.NewArrival = cloth.NewArrival
-	clothFormatter.ImageURL = ""
 
 	category := cloth.Category
 	clothCategoryFormatter := ClothCategoryFormatter{}
@@ -29,9 +33,24 @@ func FormatCloth(cloth Cloth) ClothFormatter {
 
 	clothFormatter.Category = clothCategoryFormatter
 
-	if len(cloth.ClothImages) > 0 {
-		clothFormatter.ImageURL = cloth.ClothImages[0].FileName
+	images := []ClothImageFormatter{}
+
+	for _, image := range cloth.ClothImages {
+		clothImageFormatter := ClothImageFormatter{}
+		clothImageFormatter.ImageUrl = image.FileName
+
+		isPrimary := false
+
+		if image.IsPrimary == 1 {
+			isPrimary = true
+		}
+
+		clothImageFormatter.IsPrimary = isPrimary
+
+		images = append(images, clothImageFormatter)
 	}
+
+	clothFormatter.Images = images
 
 	return clothFormatter
 }

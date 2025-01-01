@@ -49,7 +49,7 @@ func (r *repository) SaveClothVariation(clothVariation ClothVariation) (ClothVar
 func (r *repository) FindAllCloth(name string, category string) ([]Cloth, error) {
 	var cloths []Cloth
 
-	query := r.db.Preload("ClothImages", "ClothImages.is_primary = 1").Preload("Category")
+	query := r.db.Preload("ClothImages").Preload("Category")
 
 	if name != "" {
 		query = query.Where("name LIKE ?", "%"+name+"%")
