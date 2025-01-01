@@ -202,6 +202,7 @@ func (s *service) CreateClothImage(input CreateClothImageInput, fileLocation str
 	}
 
 	clothImage := ClothImage{}
+	clothImage.UserID = input.User.ID
 	clothImage.ClothID = input.ClothID
 	clothImage.IsPrimary = isPrimary
 	clothImage.FileName = fileLocation

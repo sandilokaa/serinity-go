@@ -49,11 +49,13 @@ func (ClothVariation) TableName() string {
 
 type ClothImage struct {
 	ID        int
+	UserID    int
 	ClothID   int
 	FileName  string
 	IsPrimary int
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	User      user.User
 }
 
 func (ClothImage) TableName() string {
