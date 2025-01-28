@@ -1,7 +1,7 @@
 package category
 
 import (
-	"cheggstore/user"
+	"serinitystore/user"
 	"time"
 )
 

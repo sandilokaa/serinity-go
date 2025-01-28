@@ -1,14 +1,14 @@
 package handler
 
 import (
-	"cheggstore/auth"
-	"cheggstore/helper"
-	"cheggstore/user"
-	"cheggstore/user/oauth"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"serinitystore/auth"
+	"serinitystore/helper"
+	"serinitystore/user"
+	"serinitystore/user/oauth"
 
 	"github.com/gin-gonic/gin"
 )

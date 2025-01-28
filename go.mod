@@ -1,4 +1,4 @@
-module cheggstore
+module serinitystore
 
 go 1.21.0
 

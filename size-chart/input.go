@@ -1,6 +1,6 @@
 package sizechart
 
-import "cheggstore/user"
+import "serinitystore/user"
 
 type CreateSizeChartInput struct {
 	User     user.User

@@ -1,7 +1,7 @@
 package transaction
 
 import (
-	"cheggstore/user"
+	"serinitystore/user"
 )
 
 type CreateTransactionInput struct {

@@ -1,8 +1,8 @@
 package transaction
 
 import (
-	"cheggstore/cloth"
-	"cheggstore/user"
+	"serinitystore/cloth"
+	"serinitystore/user"
 	"time"
 )
 

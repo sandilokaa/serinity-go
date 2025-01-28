@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"cheggstore/helper"
-	sizechart "cheggstore/size-chart"
-	"cheggstore/user"
 	"fmt"
 	"net/http"
+	"serinitystore/helper"
+	sizechart "serinitystore/size-chart"
+	"serinitystore/user"
 
 	"github.com/gin-gonic/gin"
 )

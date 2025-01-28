@@ -1,6 +1,6 @@
 package category
 
-import "cheggstore/user"
+import "serinitystore/user"
 
 type CreateCategoryInput struct {
 	User     user.User

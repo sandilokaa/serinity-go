@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"cheggstore/helper"
-	"cheggstore/supplier"
-	"cheggstore/user"
 	"net/http"
+	"serinitystore/helper"
+	"serinitystore/supplier"
+	"serinitystore/user"
 
 	"github.com/gin-gonic/gin"
 )

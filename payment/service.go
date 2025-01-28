@@ -1,9 +1,9 @@
 package payment
 
 import (
-	"cheggstore/user"
 	"log"
 	"os"
+	"serinitystore/user"
 	"strconv"
 
 	"github.com/joho/godotenv"

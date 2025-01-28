@@ -1,6 +1,6 @@
 package material
 
-import "cheggstore/user"
+import "serinitystore/user"
 
 type GetMaterialDetailInput struct {
 	ID int `uri:"id" binding:"required"`

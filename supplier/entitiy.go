@@ -1,7 +1,7 @@
 package supplier
 
 import (
-	"cheggstore/user"
+	"serinitystore/user"
 	"time"
 )
 

@@ -1,6 +1,6 @@
 package supplier
 
-import "cheggstore/user"
+import "serinitystore/user"
 
 type CreateSupplierInput struct {
 	User    user.User

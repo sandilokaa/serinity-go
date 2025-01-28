@@ -1,10 +1,10 @@
 package transaction
 
 import (
-	"cheggstore/cloth"
-	"cheggstore/helper"
-	"cheggstore/payment"
 	"fmt"
+	"serinitystore/cloth"
+	"serinitystore/helper"
+	"serinitystore/payment"
 	"strconv"
 
 	"github.com/veritrans/go-midtrans"

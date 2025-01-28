@@ -1,7 +1,7 @@
 package material
 
 import (
-	"cheggstore/user"
+	"serinitystore/user"
 	"time"
 )
 

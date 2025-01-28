@@ -1,7 +1,7 @@
 package cloth
 
 import (
-	"cheggstore/user"
+	"serinitystore/user"
 )
 
 type CreateClothInput struct {

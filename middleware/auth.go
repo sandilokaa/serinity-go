@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"cheggstore/auth"
-	"cheggstore/helper"
-	"cheggstore/user"
 	"net/http"
+	"serinitystore/auth"
+	"serinitystore/helper"
+	"serinitystore/user"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"

@@ -1,11 +1,11 @@
 package cloth
 
 import (
-	"cheggstore/category"
-	"cheggstore/material"
-	sizechart "cheggstore/size-chart"
-	"cheggstore/supplier"
-	"cheggstore/user"
+	"serinitystore/category"
+	"serinitystore/material"
+	sizechart "serinitystore/size-chart"
+	"serinitystore/supplier"
+	"serinitystore/user"
 	"time"
 )
 
