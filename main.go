@@ -7,6 +7,7 @@ import (
 	"serinitystore/cloth"
 	"serinitystore/material"
 	"serinitystore/payment"
+	"serinitystore/redis"
 	"serinitystore/routes"
 	sizechart "serinitystore/size-chart"
 	"serinitystore/supplier"
@@ -27,6 +28,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	// Redis connection
+	redis.InitRedis()
 
 	// Repository initialization
 	userRepository := user.NewRepository(db)
