@@ -2,14 +2,12 @@ package category
 
 type CategoryFormatter struct {
 	ID       int    `json:"id"`
-	UserID   int    `json:"user_id"`
 	Category string `json:"category"`
 }
 
 func FormatCategory(category Category) CategoryFormatter {
 	categoryFormatter := CategoryFormatter{}
 	categoryFormatter.ID = category.ID
-	categoryFormatter.UserID = category.UserID
 	categoryFormatter.Category = category.Category
 
 	return categoryFormatter
@@ -27,10 +25,8 @@ func FormatCategories(categories []Category) []CategoryFormatter {
 }
 
 type CategoryDetailFormatter struct {
-	ID       int                   `json:"id"`
-	UserID   int                   `json:"user_id"`
-	Category string                `json:"category"`
-	User     CategoryUserFormatter `json:"user"`
+	ID       int    `json:"id"`
+	Category string `json:"category"`
 }
 
 type CategoryUserFormatter struct {
@@ -42,12 +38,6 @@ func (s *Category) FormatCategoryDetail(category Category) CategoryDetailFormatt
 	categoryDetailFormatter := CategoryDetailFormatter{}
 	categoryDetailFormatter.ID = category.ID
 	categoryDetailFormatter.Category = category.Category
-
-	user := category.User
-	categoryUserFormatter := CategoryUserFormatter{}
-	categoryUserFormatter.Name = user.Name
-
-	categoryDetailFormatter.User = categoryUserFormatter
 
 	return categoryDetailFormatter
 }
