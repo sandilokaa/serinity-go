@@ -1,5 +1,14 @@
 package category
 
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
+	"serinitystore/redis"
+	"time"
+)
+
 type Service interface {
 	CreateCategory(input CreateCategoryInput) (Category, error)
 	FindAllCategory(search string) ([]Category, error)
@@ -30,9 +39,43 @@ func (s *service) CreateCategory(input CreateCategoryInput) (Category, error) {
 }
 
 func (s *service) FindAllCategory(search string) ([]Category, error) {
+	redisClient := redis.GetRedisClient()
+	ctx := context.Background()
+	var cacheKey string
+
+	if search == "" {
+		cacheKey = "categories:all"
+	} else {
+		cacheKey = fmt.Sprintf("materials:%s", search)
+	}
+
+	cachedData, err := redisClient.Get(ctx, cacheKey).Result()
+	if err != nil {
+		var categories []Category
+		err := json.Unmarshal([]byte(cachedData), &categories)
+		if err != nil {
+			log.Println("Error unmarshalling cached data:", err)
+			return nil, err
+		}
+
+		return categories, nil
+	}
+
 	categories, err := s.repository.FindAllCategory(search)
 	if err != nil {
-		return categories, err
+		log.Println("Error fetching materials from database:", err)
+		return nil, fmt.Errorf("failed to get categories: %v", err)
+	}
+
+	dataJSON, err := json.Marshal(categories)
+	if err != nil {
+		log.Println("Error marshalling data to JSON:", err)
+		return nil, err
+	}
+
+	err = redisClient.Set(ctx, cacheKey, dataJSON, 5*time.Minute).Err()
+	if err != nil {
+		log.Println("Failed to save data to Redis:", err)
 	}
 
 	return categories, nil
