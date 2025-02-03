@@ -2,14 +2,12 @@ package material
 
 type MaterialFormatter struct {
 	ID           int    `json:"id"`
-	UserID       int    `json:"user_id"`
 	MaterialName string `json:"material_name"`
 }
 
 func FormatMaterial(material Material) MaterialFormatter {
 	materialFormatter := MaterialFormatter{}
 	materialFormatter.ID = material.ID
-	materialFormatter.UserID = material.UserID
 	materialFormatter.MaterialName = material.MaterialName
 
 	return materialFormatter
@@ -27,10 +25,8 @@ func FormatMaterials(materials []Material) []MaterialFormatter {
 }
 
 type MaterialDetailFormatter struct {
-	ID           int                   `json:"id"`
-	MaterialName string                `json:"material_name"`
-	UserID       int                   `json:"user_id"`
-	User         MaterialUserFormatter `json:"user"`
+	ID           int    `json:"id"`
+	MaterialName string `json:"material_name"`
 }
 
 type MaterialUserFormatter struct {
@@ -41,12 +37,6 @@ func (m *Material) FormatMaterialDetail(material Material) MaterialDetailFormatt
 	materialDetailFormatter := MaterialDetailFormatter{}
 	materialDetailFormatter.ID = material.ID
 	materialDetailFormatter.MaterialName = material.MaterialName
-
-	user := material.User
-	materialUserFormatter := MaterialUserFormatter{}
-	materialUserFormatter.Name = user.Name
-
-	materialDetailFormatter.User = materialUserFormatter
 
 	return materialDetailFormatter
 }
