@@ -1,5 +1,14 @@
 package material
 
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
+	"serinitystore/redis"
+	"time"
+)
+
 type Service interface {
 	GetAllMaterial(search string) ([]Material, error)
 	GetMaterialById(input GetMaterialDetailInput) (Material, error)
@@ -17,12 +26,45 @@ func NewService(repository Repository) *service {
 }
 
 func (s *service) GetAllMaterial(search string) ([]Material, error) {
-	material, err := s.repository.FindAllMaterial(search)
-	if err != nil {
-		return material, err
+	redisClient := redis.GetRedisClient()
+	ctx := context.Background()
+	var cacheKey string
+
+	if search == "" {
+		cacheKey = "materials:all"
+	} else {
+		cacheKey = fmt.Sprintf("materials:%s", search)
 	}
 
-	return material, nil
+	cachedData, err := redisClient.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var materials []Material
+		err := json.Unmarshal([]byte(cachedData), &materials)
+		if err != nil {
+			log.Println("Error unmarshalling cached data:", err)
+			return nil, err
+		}
+		return materials, nil
+	}
+
+	materials, err := s.repository.FindAllMaterial(search)
+	if err != nil {
+		log.Println("Error fetching materials from database:", err)
+		return nil, fmt.Errorf("failed to get materials: %v", err)
+	}
+
+	dataJSON, err := json.Marshal(materials)
+	if err != nil {
+		log.Println("Error marshalling data to JSON:", err)
+		return nil, err
+	}
+
+	err = redisClient.Set(ctx, cacheKey, dataJSON, 5*time.Minute).Err()
+	if err != nil {
+		log.Println("Failed to save data to Redis:", err)
+	}
+
+	return materials, nil
 }
 
 func (s *service) GetMaterialById(input GetMaterialDetailInput) (Material, error) {
