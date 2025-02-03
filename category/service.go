@@ -46,24 +46,23 @@ func (s *service) FindAllCategory(search string) ([]Category, error) {
 	if search == "" {
 		cacheKey = "categories:all"
 	} else {
-		cacheKey = fmt.Sprintf("materials:%s", search)
+		cacheKey = fmt.Sprintf("categories:%s", search)
 	}
 
 	cachedData, err := redisClient.Get(ctx, cacheKey).Result()
-	if err != nil {
+	if err == nil {
 		var categories []Category
 		err := json.Unmarshal([]byte(cachedData), &categories)
 		if err != nil {
 			log.Println("Error unmarshalling cached data:", err)
 			return nil, err
 		}
-
 		return categories, nil
 	}
 
 	categories, err := s.repository.FindAllCategory(search)
 	if err != nil {
-		log.Println("Error fetching materials from database:", err)
+		log.Println("Error fetching categories from database:", err)
 		return nil, fmt.Errorf("failed to get categories: %v", err)
 	}
 
