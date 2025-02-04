@@ -1,5 +1,12 @@
 package supplier
 
+import (
+	"fmt"
+	"serinitystore/helper"
+	"serinitystore/redis"
+	"time"
+)
+
 type Service interface {
 	CreateSupplier(input CreateSupplierInput) (Supplier, error)
 	FindAllSupplier(search string) ([]Supplier, error)
@@ -32,12 +39,18 @@ func (s *service) CreateSupplier(input CreateSupplierInput) (Supplier, error) {
 }
 
 func (s *service) FindAllSupplier(search string) ([]Supplier, error) {
-	supplier, err := s.repository.FindAllSupplier(search)
-	if err != nil {
-		return supplier, err
+	redisClient := redis.GetRedisClient()
+	var cacheKey string
+
+	if search == "" {
+		cacheKey = "materials:all"
+	} else {
+		cacheKey = fmt.Sprintf("materials:%s", search)
 	}
 
-	return supplier, nil
+	return helper.GetOrSetCache(redisClient, cacheKey, 5*time.Minute, func() ([]Supplier, error) {
+		return s.repository.FindAllSupplier(search)
+	})
 }
 
 func (s *service) FindSupplierByID(input GetSupplierDetailInput) (Supplier, error) {
