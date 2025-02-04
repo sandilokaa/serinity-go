@@ -43,9 +43,9 @@ func (s *service) FindAllSupplier(search string) ([]Supplier, error) {
 	var cacheKey string
 
 	if search == "" {
-		cacheKey = "materials:all"
+		cacheKey = "suppliers:all"
 	} else {
-		cacheKey = fmt.Sprintf("materials:%s", search)
+		cacheKey = fmt.Sprintf("suppliers:%s", search)
 	}
 
 	return helper.GetOrSetCache(redisClient, cacheKey, 5*time.Minute, func() ([]Supplier, error) {
