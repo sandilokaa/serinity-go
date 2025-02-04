@@ -52,13 +52,12 @@ func (s *service) FindAllCategory(search string) ([]Category, error) {
 }
 
 func (s *service) FindCategoryByID(input GetCategoryDetailInput) (Category, error) {
-	category, err := s.repository.FindCategoryByID(input.ID)
+	redisClient := redis.GetRedisClient()
+	cacheKey := fmt.Sprintf("category:%d", input.ID)
 
-	if err != nil {
-		return category, err
-	}
-
-	return category, nil
+	return helper.GetOrSetCache(redisClient, cacheKey, 5*time.Minute, func() (Category, error) {
+		return s.repository.FindCategoryByID(input.ID)
+	})
 }
 
 func (s *service) UpdateCategoryByID(inputID GetCategoryDetailInput, inputData UpdateCategoryInput) (Category, error) {

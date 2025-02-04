@@ -54,13 +54,12 @@ func (s *service) FindAllSupplier(search string) ([]Supplier, error) {
 }
 
 func (s *service) FindSupplierByID(input GetSupplierDetailInput) (Supplier, error) {
-	supplier, err := s.repository.FindSupplierByID(input.ID)
+	redisClient := redis.GetRedisClient()
+	cacheKey := fmt.Sprintf("supplier:%d", input.ID)
 
-	if err != nil {
-		return supplier, err
-	}
-
-	return supplier, nil
+	return helper.GetOrSetCache(redisClient, cacheKey, 5*time.Minute, func() (Supplier, error) {
+		return s.repository.FindSupplierByID(input.ID)
+	})
 }
 
 func (s *service) UpdateSupplierByID(inputID GetSupplierDetailInput, inputData UpdateSupplierInput) (Supplier, error) {

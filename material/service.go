@@ -39,13 +39,12 @@ func (s *service) GetAllMaterial(search string) ([]Material, error) {
 }
 
 func (s *service) GetMaterialById(input GetMaterialDetailInput) (Material, error) {
-	material, err := s.repository.FindMaterialById(input.ID)
+	redisClient := redis.GetRedisClient()
+	cacheKey := fmt.Sprintf("material:%d", input.ID)
 
-	if err != nil {
-		return material, err
-	}
-
-	return material, nil
+	return helper.GetOrSetCache(redisClient, cacheKey, 5*time.Minute, func() (Material, error) {
+		return s.repository.FindMaterialById(input.ID)
+	})
 }
 
 func (s *service) CreateMaterial(input CreateMaterialInput) (Material, error) {
