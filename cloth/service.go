@@ -1,6 +1,12 @@
 package cloth
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"serinitystore/helper"
+	"serinitystore/redis"
+	"time"
+)
 
 type Service interface {
 	SaveCloth(input CreateClothInput) (Cloth, error)
@@ -58,21 +64,29 @@ func (s *service) SaveCloth(input CreateClothInput) (Cloth, error) {
 }
 
 func (s *service) FindAllCloth(name string, category string) ([]Cloth, error) {
-	cloths, err := s.repository.FindAllCloth(name, category)
-	if err != nil {
-		return cloths, err
+	redisClient := redis.GetRedisClient()
+	var cacheKey string
+
+	if name != "" {
+		cacheKey = fmt.Sprintf("cloths:%s", name)
+	} else if category != "" {
+		cacheKey = fmt.Sprintf("cloths:%s", category)
+	} else {
+		cacheKey = "cloths:all"
 	}
 
-	return cloths, nil
+	return helper.GetOrSetCache(redisClient, cacheKey, 5*time.Minute, func() ([]Cloth, error) {
+		return s.repository.FindAllCloth(name, category)
+	})
 }
 
 func (s *service) FindClothByID(input ClothInputDetail) (Cloth, error) {
-	cloth, err := s.repository.FindClothByID(input.ID)
-	if err != nil {
-		return cloth, err
-	}
+	redisClient := redis.GetRedisClient()
+	cacheKey := fmt.Sprintf("cloth:%d", input.ID)
 
-	return cloth, nil
+	return helper.GetOrSetCache(redisClient, cacheKey, 5*time.Minute, func() (Cloth, error) {
+		return s.repository.FindClothByID(input.ID)
+	})
 }
 
 func (s *service) FindClothVariationByID(input ClothInputDetail) (ClothVariation, error) {
