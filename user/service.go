@@ -3,6 +3,8 @@ package user
 import (
 	"errors"
 	"reflect"
+	"serinitystore/helper"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -11,6 +13,7 @@ type Service interface {
 	RegisterUser(input RegisterUserInput) (User, error)
 	LoginUser(input LoginUserInput) (User, error)
 	GetUserById(ID int) (User, error)
+	SaveOTPRequest(input ForgotPasswordUserInput) (OtpRequest, error)
 }
 
 type service struct {
@@ -80,4 +83,19 @@ func (s *service) GetUserById(ID int) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *service) SaveOTPRequest(input ForgotPasswordUserInput) (OtpRequest, error) {
+	otpRequest := OtpRequest{}
+	otpRequest.Email = input.Email
+	otpRequest.Otp = helper.GenerateOTP()
+	otpRequest.ExpiredAt = time.Now().Add(3 * time.Minute)
+	otpRequest.IsVerified = false
+
+	newOtpRequest, err := s.repository.SaveOTPRequest(otpRequest)
+	if err != nil {
+		return newOtpRequest, err
+	}
+
+	return newOtpRequest, nil
 }

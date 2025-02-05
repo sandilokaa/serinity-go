@@ -11,3 +11,13 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type OtpRequest struct {
+	ID         int
+	Email      string
+	Otp        string
+	IsVerified bool
+	ExpiredAt  time.Time
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}

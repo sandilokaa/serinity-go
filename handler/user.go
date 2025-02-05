@@ -134,3 +134,28 @@ func (h *userHandler) CallbackHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, userInfo)
 }
+
+func (h *userHandler) OtpRequest(c *gin.Context) {
+	var input user.ForgotPasswordUserInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.APIResponse("Otp request failed", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	newOtpRequest, err := h.userService.SaveOTPRequest(input)
+	if err != nil {
+		response := helper.APIResponse("Otp request failed", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.APIResponse("OTP has been sent to your email", http.StatusOK, "success", newOtpRequest)
+
+	c.JSON(http.StatusOK, response)
+}

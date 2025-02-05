@@ -6,6 +6,7 @@ type Repository interface {
 	Save(user User) (User, error)
 	FindByEmail(email string) (User, error)
 	FindById(ID int) (User, error)
+	SaveOTPRequest(otpRequest OtpRequest) (OtpRequest, error)
 }
 
 type repository struct {
@@ -45,4 +46,13 @@ func (r *repository) FindById(ID int) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *repository) SaveOTPRequest(otpRequest OtpRequest) (OtpRequest, error) {
+	err := r.db.Create(&otpRequest).Error
+	if err != nil {
+		return otpRequest, err
+	}
+
+	return otpRequest, nil
 }
