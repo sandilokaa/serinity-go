@@ -14,3 +14,7 @@ type LoginUserInput struct {
 type ForgotPasswordUserInput struct {
 	Email string `json:"email" binding:"required"`
 }
+
+type OTPUserInput struct {
+	Otp string `json:"otp" binding:"required"`
+}

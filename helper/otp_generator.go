@@ -3,14 +3,13 @@ package helper
 import (
 	"crypto/rand"
 	"fmt"
-	"log"
+	"math/big"
 )
 
 func GenerateOTP() string {
-	otp := make([]byte, 3)
-	_, err := rand.Read(otp)
+	n, err := rand.Int(rand.Reader, big.NewInt(1000000))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	return fmt.Sprintf("%06d", int(otp[0])%1000000)
+	return fmt.Sprintf("%06d", n.Int64())
 }

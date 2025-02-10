@@ -21,3 +21,7 @@ type OtpRequest struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
+
+func (OtpRequest) TableName() string {
+	return "OtpRequests"
+}

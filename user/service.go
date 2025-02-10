@@ -14,6 +14,7 @@ type Service interface {
 	LoginUser(input LoginUserInput) (User, error)
 	GetUserById(ID int) (User, error)
 	SaveOTPRequest(input ForgotPasswordUserInput) (OtpRequest, error)
+	UpdateIsVerifiedOTP(inputData OTPUserInput) (OtpRequest, error)
 }
 
 type service struct {
@@ -98,4 +99,21 @@ func (s *service) SaveOTPRequest(input ForgotPasswordUserInput) (OtpRequest, err
 	}
 
 	return newOtpRequest, nil
+}
+
+func (s *service) UpdateIsVerifiedOTP(inputData OTPUserInput) (OtpRequest, error) {
+	otpRequest, err := s.repository.FindOTPByOTP(inputData.Otp)
+	if err != nil {
+		return otpRequest, err
+	}
+
+	otpRequest.Otp = inputData.Otp
+	otpRequest.IsVerified = true
+
+	updatedIsVerfied, err := s.repository.UpdateIsVerifiedOTP(otpRequest)
+	if err != nil {
+		return updatedIsVerfied, err
+	}
+
+	return updatedIsVerfied, nil
 }

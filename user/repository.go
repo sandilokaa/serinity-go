@@ -7,6 +7,8 @@ type Repository interface {
 	FindByEmail(email string) (User, error)
 	FindById(ID int) (User, error)
 	SaveOTPRequest(otpRequest OtpRequest) (OtpRequest, error)
+	FindOTPByOTP(OTP string) (OtpRequest, error)
+	UpdateIsVerifiedOTP(otpRequest OtpRequest) (OtpRequest, error)
 }
 
 type repository struct {
@@ -50,6 +52,26 @@ func (r *repository) FindById(ID int) (User, error) {
 
 func (r *repository) SaveOTPRequest(otpRequest OtpRequest) (OtpRequest, error) {
 	err := r.db.Create(&otpRequest).Error
+	if err != nil {
+		return otpRequest, err
+	}
+
+	return otpRequest, nil
+}
+
+func (r *repository) FindOTPByOTP(OTP string) (OtpRequest, error) {
+	var otpRequest OtpRequest
+
+	err := r.db.Where("otp = ?", OTP).First(&otpRequest).Error
+	if err != nil {
+		return otpRequest, err
+	}
+
+	return otpRequest, nil
+}
+
+func (r *repository) UpdateIsVerifiedOTP(otpRequest OtpRequest) (OtpRequest, error) {
+	err := r.db.Save(&otpRequest).Error
 	if err != nil {
 		return otpRequest, err
 	}

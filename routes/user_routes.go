@@ -15,4 +15,6 @@ func userRoutes(router *gin.RouterGroup, userService user.Service, authService a
 	router.POST("/sessions", userHandler.LoginUser)
 	router.GET("/sessions/oauth", userHandler.GetLoginGoogleURL)
 	router.GET("/sessions/oauth/callback", userHandler.CallbackHandler)
+	router.POST("/forgot-passwords", userHandler.OtpRequest)
+	router.PUT("/forgot-passwords", userHandler.UpdateIsVerifiedOTP)
 }

@@ -17,3 +17,21 @@ func FormatUser(user User, token string) UserFormatter {
 
 	return formatter
 }
+
+type OTPFormatter struct {
+	ID         int    `json:"id"`
+	Email      string `json:"email"`
+	Otp        string `json:"otp"`
+	IsVerified bool   `json:"is_verified"`
+}
+
+func FormatOTP(otpRequest OtpRequest) OTPFormatter {
+	formatter := OTPFormatter{
+		ID:         otpRequest.ID,
+		Email:      otpRequest.Email,
+		Otp:        otpRequest.Otp,
+		IsVerified: otpRequest.IsVerified,
+	}
+
+	return formatter
+}
