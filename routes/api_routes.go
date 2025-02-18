@@ -6,6 +6,7 @@ import (
 	"serinitystore/cloth"
 	"serinitystore/material"
 	"serinitystore/middleware"
+	"serinitystore/otp"
 	sizechart "serinitystore/size-chart"
 	"serinitystore/supplier"
 	"serinitystore/transaction"
@@ -24,12 +25,14 @@ func RegisterRoutes(
 	sizeChartService sizechart.Service,
 	clothService cloth.Service,
 	transactionService transaction.Service,
+	otpService otp.Service,
 ) {
 	api := router.Group("/api/v1")
 
 	userRoutes(api, userService, authService)
 	clothRoutes(api, clothService)
 	transactionRoutes(api, transactionService)
+	otpRoutes(api, otpService)
 
 	protected := api.Group("/protected", middleware.AuthMiddleware(authService, userService))
 	{

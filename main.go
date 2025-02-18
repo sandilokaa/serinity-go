@@ -6,6 +6,7 @@ import (
 	"serinitystore/category"
 	"serinitystore/cloth"
 	"serinitystore/material"
+	"serinitystore/otp"
 	"serinitystore/payment"
 	"serinitystore/redis"
 	"serinitystore/routes"
@@ -40,6 +41,7 @@ func main() {
 	sizeChartRepository := sizechart.NewRepository(db)
 	clothRepository := cloth.NewRepository(db)
 	transactionRepository := transaction.NewRepository(db)
+	otpRepository := otp.NewOTPRepository(redis.RedisClient)
 
 	// Service initialization
 	userService := user.NewService(userRepository)
@@ -51,6 +53,7 @@ func main() {
 	clothService := cloth.NewService(clothRepository)
 	paymentService := payment.NewService()
 	transactionService := transaction.NewService(transactionRepository, clothRepository, paymentService)
+	otpService := otp.Service(otpRepository)
 
 	// Router setup
 	router := gin.Default()
@@ -67,6 +70,7 @@ func main() {
 		sizeChartService,
 		clothService,
 		transactionService,
+		otpService,
 	)
 
 	router.Run()
