@@ -1,7 +1,7 @@
 package otp
 
 type Service interface {
-	SaveOTP(input OTPRequest) (OTPRequest, error)
+	SaveOTP(input OTPRequest) error
 }
 
 type otpService struct {
@@ -12,17 +12,12 @@ func NewOTPService(repository Repository) *otpService {
 	return &otpService{repository}
 }
 
-func (s *otpService) SaveOTP(input OTPRequest) (OTPRequest, error) {
+func (s *otpService) SaveOTP(input OTPRequest) error {
 	otpRequest := OTPRequest{
 		Email:  input.Email,
 		Otp:    input.Otp,
 		Expiry: input.Expiry,
 	}
 
-	err := s.repository.SaveOTP(otpRequest)
-	if err != nil {
-		return otpRequest, err
-	}
-
-	return otpRequest, nil
+	return s.repository.SaveOTP(otpRequest)
 }

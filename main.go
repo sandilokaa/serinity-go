@@ -53,7 +53,7 @@ func main() {
 	clothService := cloth.NewService(clothRepository)
 	paymentService := payment.NewService()
 	transactionService := transaction.NewService(transactionRepository, clothRepository, paymentService)
-	otpService := otp.Service(otpRepository)
+	otpService := otp.NewOTPService(otpRepository)
 
 	// Router setup
 	router := gin.Default()

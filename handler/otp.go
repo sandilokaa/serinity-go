@@ -34,22 +34,21 @@ func (h *otpHandler) SaveOTP(c *gin.Context) {
 	input.Otp = helper.GenerateOTP()
 	input.Expiry = time.Now().Add(3 * time.Minute)
 
-	newOtpRequest, err := h.service.SaveOTP(input)
+	err = h.service.SaveOTP(input)
 	if err != nil {
 		response := helper.APIResponse("Otp request failed", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	emailBody := fmt.Sprintf("Kode OTP Anda adalah: %s\n Kode ini berlaku hingga:%s", newOtpRequest.Otp, newOtpRequest.Expiry.Format(time.RFC3339))
-	err = helper.SendEmail(newOtpRequest.Email, "Kode OTP Anda", emailBody)
+	emailBody := fmt.Sprintf("Kode OTP Anda adalah: %s\nKode ini berlaku hingga: %s", input.Otp, input.Expiry.Format(time.RFC3339))
+	err = helper.SendEmail(input.Email, "Kode OTP Anda", emailBody)
 	if err != nil {
 		response := helper.APIResponse("Failed to send email", http.StatusInternalServerError, "error", nil)
-		c.JSON(http.StatusBadRequest, response)
+		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := helper.APIResponse("OTP has been sent to your email", http.StatusOK, "success", newOtpRequest)
-
+	response := helper.APIResponse("OTP has been sent to your email", http.StatusOK, "success", input)
 	c.JSON(http.StatusOK, response)
 }

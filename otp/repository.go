@@ -20,11 +20,11 @@ func NewOTPRepository(rdb *redis.Client) *otpRepository {
 	return &otpRepository{rdb: rdb, ctx: context.Background()}
 }
 
-func (r *otpRepository) SaveOTP(otpRequest OTPRequest) (OTPRequest, error) {
+func (r *otpRepository) SaveOTP(otpRequest OTPRequest) error {
 	err := r.rdb.Set(r.ctx, "otp:"+otpRequest.Email, otpRequest.Otp, time.Until(otpRequest.Expiry)).Err()
 	if err != nil {
-		return otpRequest, err
+		return err
 	}
 
-	return otpRequest, nil
+	return nil
 }
