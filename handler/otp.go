@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"serinitystore/helper"
 	"serinitystore/otp"
@@ -40,13 +41,13 @@ func (h *otpHandler) SaveOTP(c *gin.Context) {
 		return
 	}
 
-	// emailBody := fmt.Sprintf("Kode OTP Anda adalah: %s\nKode ini berlaku hingga: %s", input.Otp, input.Expiry.Format(time.RFC3339))
-	// err = helper.SendEmail(input.Email, "Kode OTP Anda", emailBody)
-	// if err != nil {
-	// 	response := helper.APIResponse("Failed to send email", http.StatusInternalServerError, "error", nil)
-	// 	c.JSON(http.StatusInternalServerError, response)
-	// 	return
-	// }
+	emailBody := fmt.Sprintf("Kode OTP Anda adalah: %s\nKode ini berlaku hingga: %s", input.Otp, input.Expiry.Format(time.RFC3339))
+	err = helper.SendEmail(input.Email, "Kode OTP Anda", emailBody)
+	if err != nil {
+		response := helper.APIResponse("Failed to send email", http.StatusInternalServerError, "error", nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
 
 	response := helper.APIResponse("OTP has been sent to your email", http.StatusOK, "success", input)
 	c.JSON(http.StatusOK, response)
