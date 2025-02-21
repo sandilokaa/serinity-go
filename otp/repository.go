@@ -9,6 +9,7 @@ import (
 
 type Repository interface {
 	SaveOTP(otpRequest OTPRequest) error
+	GetOTP(email string) (string, error)
 }
 
 type otpRepository struct {
@@ -27,4 +28,13 @@ func (r *otpRepository) SaveOTP(otpRequest OTPRequest) error {
 	}
 
 	return nil
+}
+
+func (r *otpRepository) GetOTP(email string) (string, error) {
+	otp, err := r.rdb.Get(r.ctx, "otp:"+email).Result()
+	if err != nil {
+		return "", err
+	}
+
+	return otp, nil
 }
