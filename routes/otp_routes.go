@@ -13,5 +13,6 @@ func otpRoutes(router *gin.RouterGroup, otpService otp.Service) {
 	otpRoutes := router.Group("/forgot-password")
 	{
 		otpRoutes.POST("/send-email", otpHandler.SaveOTP)
+		otpRoutes.POST("/verify-otp", otpHandler.VerifyOTP)
 	}
 }
