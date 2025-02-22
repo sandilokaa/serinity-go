@@ -41,7 +41,28 @@ func (h *otpHandler) SaveOTP(c *gin.Context) {
 		return
 	}
 
-	emailBody := fmt.Sprintf("Kode OTP Anda adalah: %s\nKode ini berlaku hingga: %s", input.Otp, input.Expiry.Format(time.RFC3339))
+	emailBody := fmt.Sprintf(
+		`
+		<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 70px 200px;">
+			<div style="padding: 5px 40px; background-color: #000000; border-radius: 5px 5px 0 0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+				<p style="font-size: 30px; color: #FFFFFF;">Permintaan merubah kata sandi</p>
+			</div>
+			<div style="background-color: #FFFFFF; border-radius: 0 0 5px 5px; padding: 20px 40px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size: 14px;">
+				<p>Halo %s,</p>
+				<p>Seseorang telah meminta kata sandi baru untuk akun berikut di Serinity:</p>
+				<p>Jika Anda tidak membuat permintaan, abaikan saja email ini. Jika Anda ingin melanjutkan:</p>
+				<p style="font-size: 18px !important; font-weight: bold; color: #0000000;">Kode OTP Anda: %s</p>
+				<p style="color: #888888;">Kode ini berlaku hingga: %s</p>
+			</div>
+			<div style="margin-top: 20px;">
+				<p style="font-size: 12px; text-align: center;">Serinity — Built with Love</p>
+			</div>
+		</div>
+		`,
+		input.Email,
+		input.Otp,
+		input.Expiry.Format(time.RFC3339),
+	)
 	err = helper.SendEmail(input.Email, "Kode OTP Anda", emailBody)
 	if err != nil {
 		response := helper.APIResponse("Failed to send email", http.StatusInternalServerError, "error", nil)
