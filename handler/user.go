@@ -85,6 +85,8 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
+	c.SetCookie("token", token, 7200, "/", "", false, true)
+
 	formatter := user.FormatUser(loggedinUser, token)
 	response := helper.APIResponse("Loggedin successfully", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)

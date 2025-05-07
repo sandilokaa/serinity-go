@@ -29,6 +29,19 @@ func AuthMiddleware(authService auth.Service, userService user.Service) gin.Hand
 			tokenString = arrayToken[1]
 		}
 
+		if tokenString == "" {
+			cookie, err := c.Cookie("token")
+			if err == nil {
+				tokenString = cookie
+			}
+		}
+
+		if tokenString == "" {
+			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
 		token, err := authService.ValidateToken(tokenString)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
