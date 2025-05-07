@@ -92,6 +92,12 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *userHandler) LogoutUser(c *gin.Context) {
+	c.SetCookie("token", "", -1, "/", "", false, true)
+	response := helper.APIResponse("Logout successful", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *userHandler) CurrentUser(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(user.User)
 	formatter := user.FormatUser(currentUser, "")
